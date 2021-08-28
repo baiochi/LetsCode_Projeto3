@@ -79,17 +79,34 @@ class Loja(object):
     def diminuirEstoque(self, estoque):
         self.estoque -= estoque
 
-    # - Calcular a conta quando o cliente decidir devolver a bicicleta;
+    # Calcular a conta quando o cliente decidir devolver a bicicleta;
     def calcularConta(self, cliente):
         if cliente.modeloAluguel == 'hora':
-            # Calcular a hora
-            tempoAluguel = cliente.dataAluguel
-
+            dataAtual = dt.now()
+            # calcula os minutos
+            minutos = dataAtual.minute - cliente.dataAluguel.minute
+            if minutos < 0: minutos += 60 # evita deixar os minutos em negativos
+            # calcula as horas
+            horas = dataAtual.hour - cliente.dataAluguel.hour
+            # soma final, computando os minutos excedentes
+            tempoAluguel = (horas + (minutos/60)).__round__()
+            # calcula o valor
+            valorAluguel = tempoAluguel * 5
+            print(f'hora da devolucao: {dataAtual.hour}, hora do aluguel: {cliente.dataAluguel.strftime("%H:%M:%S")}')
+            return valorAluguel
 
         if cliente.modeloAluguel == 'dia':
-            pass
+            dataAtual = dt.now()
+            tempoAluguel = dataAtual.day - cliente.dataAluguel.day
+            valorAluguel = tempoAluguel * 25
+            return valorAluguel
+
         if cliente.modeloAluguel == 'semana':
-            pass
+            dataAtual = dt.now()
+            tempoAluguel = (dataAtual.day - cliente.dataAluguel.day)/7
+            tempoAluguel = tempoAluguel // 1 # arredonda o número
+            valorAluguel = tempoAluguel * 100
+            return valorAluguel
         pass
 
     #- Receber pedidos de aluguéis por hora, diários ou semanais validando a possibilidade com o estoque.
