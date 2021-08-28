@@ -4,12 +4,12 @@ from datetime import date
 
 
 class Cliente(object):
-     def __init__(self, nome):
+    def __init__(self, nome):
         self.cliente = nome
     
     # Ver as bicicletas disponíveis na Loja;
     def disponivel(self, loja):
-       print(loja.estoque)
+       print(f'Quantidade de bicicletas disponiveis: {loja.estoque}')
 
     # Alugar bicicletas:
     #   por hora (R$5/hora);
@@ -18,22 +18,27 @@ class Cliente(object):
     # Aluguel para família, uma promoção que pode incluir de 3 a 5 empréstimos
     # (de qualquer tipo) com 30% de desconto no valor total.
 
-
     def alugar(self, loja):
         try:
-            quantidade = int(input('Quantidade de Bicicletas que deseja alugar: '))
-            if quantidade > loja.estoque:
+            self.quantidadeAlugada = int(input('Informe a quantidade de bicicletas que deseja alugar: '))
+            if self.quantidadeAlugada > loja.estoque:
                 raise ValueError
-            diaInicial = datetime.today()
-            horaInicial = {'h': 16, 'm': 35}
-            
-                        
+            self.dataInicial = datetime.today()
+            self.horaInicial = int(input('Informe a hora do aluguel: '))  
         except ValueError:
-            print('msg erro')
+            print('Você deseja alugar {} bicicletas, mas a loja só tem {}'.format(self.quantidadeAlugada, loja.estoque))
             self.alugar(loja)               
     
-    def devolver(self, horaDevolucao, quantidade, familiar):
-        pass
+    def devolver(self, loja):
+        try:
+            self.quantidadeDevolvida = int(input('Informe a quantidade de bicicletas que deseja devolver: '))
+            if self.quantidadeDevolvida > self.quantidadeAlugada:
+                raise ValueError
+            self.dataFinal = datetime.today()
+            self.horaFinal = int(input('Informe a hora da devolução: '))
+        except ValueError:
+            print('Você alugou: {} bicicletas, e deseja devolver {}. informe um valor valido'.format(self.quantidadeAlugada, self.quantidadeDevolvida)
+
     
 class Loja(object):
     def __init__(self):
@@ -46,6 +51,6 @@ class Loja(object):
         
 # COMPRA DE BICICLETAS
 
-lojaMatriz = Loja('Bicicletas Paraiso', 'Rua Nascer do sol', 5)
+Matriz = Loja()
 cliente = Cliente('jose')
 cliente.disponivel(lojaMatriz)
