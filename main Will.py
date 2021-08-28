@@ -2,8 +2,9 @@ from datetime import date as dtd
 from datetime import time as dtt
 
 class Loja (object):
-    def __init__ (self):
-        self.estoque = 100
+    
+    def __init__ (self, estoque):
+        self.estoque = estoque
     
     # Mostrar o estoque de bicicletas para o Cliente;
     def mostrarEstoque (self):
@@ -23,7 +24,8 @@ class Loja (object):
         self.opcaoDesejada = opcaoDesejada
         self.pedido = pedido
 
-class Cliente (Loja):
+class Cliente (object): # alterado parametro Loja para object, não é necessário ela ser herdada
+    
     def __init__ (self):
         self.carteira = 1000
 
@@ -43,6 +45,11 @@ class Cliente (Loja):
     # (de qualquer tipo) com 30% de desconto no valor total.
     def alugarFamilia (self, quantidade, *opcaoDesejada):
         pass
+
+# Inicializacao das class
+
+cliente = Cliente()
+loja = Loja(100)
 
 print('Bem vindo à Locadora de Bicicletas LTDA!')
 print('Aqui temos uma variedade de planos para o aluguel de bicicletas, que são:')
@@ -64,28 +71,36 @@ while opcao not in _opcoes:
     opcao = input('\nOpção inválida! Qual o plano que você deseja contratar? ').upper()
 
 if opcao == 'E':
-    print('O estoque atual é de {pass} biciletas disponíveis.')
+    print(f'O estoque atual é de {loja.mostrarEstoque()} biciletas disponíveis.')
     opcao = input('\nQual o plano que você deseja contratar? ').upper()
 
-elif opcao == 0:
+# alterei os números para string pois no input ele não estava lendo int
+#
+elif opcao == '0':
     print('\nÉ uma pena... Mas aguardamos você numa próxima!')
 
-elif opcao == 1:
+# Plano Hora
+elif opcao == '1':
     print('\nO plano \"Dar uma voltinha\" foi selecionado!')
     qtdHoras = input('Por quantas horas você deseja alugar? ')
-    Cliente.alugarHora(qtdHoras)
+    cliente.alugarHora(qtdHoras)
 
-elif opcao == 2:
+# Plano Dia
+elif opcao == '2':
     print('\nO plano Diário foi selecionado!')
     qtdDias = input('Por quantos dias você deseja alugar? ')
-    Cliente.alugarDia(qtdDias)
+    cliente.alugarDia(qtdDias)
 
-elif opcao == 3:
+# Plano Semana
+elif opcao == '3':
     print('\nO plano Semanal foi selecionado!')
     qtdSemanas = input('Por quantas semanas você deseja alugar? ')
-    Cliente.alugarSemana(qtdSemanas)
+    cliente.alugarSemana(qtdSemanas)
 
-else: # opcao == 4
+elif opcao == '4': #acho que se mantesse o else, qualquer outra coisa digitada entraria aqui
     print('\nO plano Família foi selecionado!')
+
+else:
+    print('\nOpção inválida!')
 
 print('\nFim do programa.')
