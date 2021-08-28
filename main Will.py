@@ -6,9 +6,12 @@ class Loja (object):
         self.estoque = 100
     
     # Mostrar o estoque de bicicletas para o Cliente;
-    def mostrarEstoque (self, estoque):
+    def mostrarEstoque (self):
+        return self.estoque
+
+    # Alterar a quantidade do estoque.
+    def alterarEstoque (self, estoque):
         self.estoque = estoque
-        return estoque
 
     # Receber pedidos de aluguéis por hora, diários ou semanais validando a disponibilidade do estoque.
     def receberPedido (self, estoqueAtual, pedido):
