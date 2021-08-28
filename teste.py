@@ -1,7 +1,7 @@
 #first file
 
-from datetime import datetime.date as dtd
-from datetime import datetime.time as dtt
+from datetime import date as dtd
+from datetime import time as dtt
 
 class Cliente(object):
     # Ver as bicicletas disponíveis na Loja;
@@ -24,12 +24,10 @@ class Cliente(object):
                 raise ValueError
                 
             familiar = input('É um aluguel familiar? ')
-            # data 
             
         except ValueError:
             print('msg erro')
-            self.alugar(loja)
-                        
+            self.alugar(loja)               
     
     def devolver(self, horaDevolucao, quantidade, familiar):
         pass
