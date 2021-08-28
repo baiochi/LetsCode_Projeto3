@@ -46,6 +46,50 @@ class Cliente (object):
     def alugarFamilia (self, quantidade, *opcaoDesejada):
         pass
 
+# Função para validar a entrada de dados do input do cliente:
+# Argumentos: entrada
+# Retorna: entrada
+def validaEntrada(entrada):
+    _opcoes = ('0', '1', '2', '3', '4', 'E')
+    while entrada not in _opcoes:
+        entrada = input('\nOpção inválida! Qual o plano que você deseja contratar? ').upper()
+    return entrada
+
+# Função do menu do cliente:
+# Argumentos: entrada
+# Retorna: 
+def menuEntradas(entrada):
+    if entrada == 'E':
+        print(f'O estoque atual é de {loja.mostrarEstoque()} biciletas disponíveis.')
+        entrada = validaEntrada(input('\nQual o plano que você deseja contratar? ').upper())
+        menuEntradas(entrada)
+
+    elif entrada == '0':
+        print('\nÉ uma pena... Mas aguardamos você numa próxima!')
+
+    # Plano Hora
+    elif entrada == '1':
+        print('\nO plano \"Dar uma voltinha\" foi selecionado!')
+        qtdHoras = input('Por quantas horas você deseja alugar? ')
+        cliente.alugarHora(qtdHoras)
+
+    # Plano Dia
+    elif entrada == '2':
+        print('\nO plano Diário foi selecionado!')
+        qtdDias = input('Por quantos dias você deseja alugar? ')
+        cliente.alugarDia(qtdDias)
+
+    # Plano Semana
+    elif entrada == '3':
+        print('\nO plano Semanal foi selecionado!')
+        qtdSemanas = input('Por quantas semanas você deseja alugar? ')
+        cliente.alugarSemana(qtdSemanas)
+
+    # Plano Família
+    else: # opcao == '4'
+        print('\nO plano Família foi selecionado!')
+
+
 # Inicializacao das class
 cliente = Cliente(1000)
 loja = Loja(100)
@@ -62,40 +106,7 @@ print('Digite o valor de 1 a 4 conforme o plano desejado,')
 print('digite \"E\" para visualizar a quantidade de biciletas em estoque')
 print('ou digite 0 para cancelar.')
 
-opcao = input('\nQual o plano que você deseja contratar? ').upper()
-# Tupla para selecionar as opções de alguel que o cliente vai ter.
-_opcoes = ('0', '1', '2', '3', '4', 'E')
-
-while opcao not in _opcoes:
-    opcao = input('\nOpção inválida! Qual o plano que você deseja contratar? ').upper()
-
-if opcao == 'E':
-    print(f'O estoque atual é de {loja.mostrarEstoque()} biciletas disponíveis.')
-    opcao = input('\nQual o plano que você deseja contratar? ').upper()
-
-elif opcao == '0':
-    print('\nÉ uma pena... Mas aguardamos você numa próxima!')
-
-# Plano Hora
-elif opcao == '1':
-    print('\nO plano \"Dar uma voltinha\" foi selecionado!')
-    qtdHoras = input('Por quantas horas você deseja alugar? ')
-    cliente.alugarHora(qtdHoras)
-
-# Plano Dia
-elif opcao == '2':
-    print('\nO plano Diário foi selecionado!')
-    qtdDias = input('Por quantos dias você deseja alugar? ')
-    cliente.alugarDia(qtdDias)
-
-# Plano Semana
-elif opcao == '3':
-    print('\nO plano Semanal foi selecionado!')
-    qtdSemanas = input('Por quantas semanas você deseja alugar? ')
-    cliente.alugarSemana(qtdSemanas)
-
-# Plano Família
-else: # opcao == '4'
-    print('\nO plano Família foi selecionado!')
+opcao = validaEntrada(input('\nQual o plano que você deseja contratar? ').upper())
+menuEntradas(opcao)
 
 print('\nFim do programa.')
