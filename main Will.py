@@ -32,8 +32,9 @@ class Loja (object):
         self.estoque = 100
     
     # Mostrar o estoque de bicicletas;
-    def mostraEstoque (self):
-        pass
+    def mostraEstoque (self, estoque):
+        print(f'O estoque atual é de {estoque} bicicleta(s).')
+        return estoque
     
     # Receber pedidos de aluguéis por hora, diários ou semanais validando a possibilidade com o estoque.
     def recebePedido (self):
@@ -42,4 +43,6 @@ class Loja (object):
     # Calcular a conta quando o cliente decidir devolver a bicicleta;
     def calculaConta (self):
         pass
-    
+
+# Tupla para selecionar as opções de alguel que o cliente vai ter.
+opcoes = (1, 2, 3, 4)
