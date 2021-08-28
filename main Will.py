@@ -24,10 +24,10 @@ class Loja (object):
         self.opcaoDesejada = opcaoDesejada
         self.pedido = pedido
 
-class Cliente (object): # alterado parametro Loja para object, não é necessário ela ser herdada
+class Cliente (object):
     
-    def __init__ (self):
-        self.carteira = 1000
+    def __init__ (self, carteira):
+        self.carteira = carteira
 
     # Alugar bicicletas por hora (R$5/hora);
     def alugarHora (self, periodo):
@@ -47,8 +47,7 @@ class Cliente (object): # alterado parametro Loja para object, não é necessár
         pass
 
 # Inicializacao das class
-
-cliente = Cliente()
+cliente = Cliente(1000)
 loja = Loja(100)
 
 print('Bem vindo à Locadora de Bicicletas LTDA!')
@@ -74,8 +73,6 @@ if opcao == 'E':
     print(f'O estoque atual é de {loja.mostrarEstoque()} biciletas disponíveis.')
     opcao = input('\nQual o plano que você deseja contratar? ').upper()
 
-# alterei os números para string pois no input ele não estava lendo int
-#
 elif opcao == '0':
     print('\nÉ uma pena... Mas aguardamos você numa próxima!')
 
@@ -97,10 +94,8 @@ elif opcao == '3':
     qtdSemanas = input('Por quantas semanas você deseja alugar? ')
     cliente.alugarSemana(qtdSemanas)
 
-elif opcao == '4': #acho que se mantesse o else, qualquer outra coisa digitada entraria aqui
+# Plano Família
+else: # opcao == '4'
     print('\nO plano Família foi selecionado!')
-
-else:
-    print('\nOpção inválida!')
 
 print('\nFim do programa.')
