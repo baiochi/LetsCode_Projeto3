@@ -42,3 +42,8 @@ print(f'Estoque atual da loja: {loja.mostrarEstoque()}\n')
 print(f'Cliente {cliente2.getNome()} finalizando o aluguel...')
 print(f'O valor da conta ficou em R$ {loja.devolverBicicletas(cliente=cliente2)}')
 print(f'Estoque atual da loja: {loja.mostrarEstoque()}\n')
+
+#testando método mágico __repr__
+print(cliente1)
+print(loja)
+print('end.')

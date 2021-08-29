@@ -22,7 +22,7 @@ class Cliente(object):
     def __repr__(self):
         # verifica a existencia dos atributos da classe
         if(hasattr(self, 'nome') and hasattr(self, 'cpf')):
-            return f'Nome: {self.nome}; CPF: {self.cpf}'
+            return f'Dados do Cliente\nNome: {self.nome}; CPF: {self.cpf}'
         else:
             return 'Dados inválido dos cliente.'
 
@@ -60,9 +60,9 @@ class Loja(object):
     def __repr__(self):
         # verifica a existencia dos atributos da classe
         if(hasattr(self, 'estoque') and hasattr(self, 'tabelaPrecos') and hasattr(self, 'historicoAluguel')):
-            print(f'Estoque: {self.estoque}.\n')
-            print(f'Tabela de Preços: {self.tabelaPrecos}\n')   # aprimorar a formatação
-            print(f'Histórico dos Aluguéis: {self.estoque}')    # aprimorar a formatação
+            return f'Dados da loja\nEstoque: {self.estoque}\nTabela de Preços: {self.tabelaPrecos}\n'
+            # Histórico dos Aluguéis: {self.historicoAluguel}   <- melhorar a formatacao do dicionario
+                
         else:
             return 'Dados inválidos da Loja.'
 
