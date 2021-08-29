@@ -1,4 +1,4 @@
-from class_joao import Cliente, Loja
+from my_class import Cliente, Loja
 from datetime import datetime as dt
 
 # incializando as classes
