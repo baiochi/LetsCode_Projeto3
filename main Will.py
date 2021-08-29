@@ -1,10 +1,8 @@
-from datetime import date as dtd
-from datetime import time as dtt
-
 class Loja (object):
     
-    def __init__ (self, estoque):
+    def __init__ (self, estoque, caixa):
         self.estoque = estoque
+        self.caixa = caixa
     
     # Mostrar o estoque de bicicletas para o Cliente;
     def mostrarEstoque (self):
@@ -15,12 +13,29 @@ class Loja (object):
         self.estoque -= baixa
 
     # Receber pedidos de aluguéis por hora, diários ou semanais validando a disponibilidade do estoque.
-    def receberPedido (self, periodo, *quantPlano):
-        self.periodo = periodo
+    def receberPedido (self, periodo, quantidade, plano, desconto):
+        self.periodo = int(periodo)
+        self.quantidade = int(quantidade)
+        self.plano = plano
+        self.desconto = desconto
 
     # Calcular a conta quando o cliente decidir devolver a bicicleta;
     def calcularConta (self):
-        pass
+        if self.plano == '1':
+            if self.desconto:
+                total = (self.periodo * self.quantidade * 5) * 0,7
+            else:
+                total = self.periodo * self.quantidade * 5
+        elif self.plano == "2":
+            if self.desconto:
+                total = (self.periodo * self.quantidade * 25) * 0,7
+            else:
+                total = self.periodo * self.quantidade * 25
+        else:
+            if self.desconto:
+                total = (self.periodo * self.quantidade * 100) * 0,7
+            else:
+                total = self.periodo * self.quantidade * 100
 
 class Cliente (object):
     
@@ -135,8 +150,8 @@ def menuEntradas(entrada):
         cliente.alugarFamilia(periodo, qtdBicicletas, plano)
 
 # Init classes
-cliente = Cliente(1000)
-loja = Loja(100)
+cliente = Cliente(200)
+loja = Loja(100, 500)
 
 print('Bem vindo à Locadora de Bicicletas LTDA!')
 print('Aqui temos uma variedade de planos para o aluguel de bicicletas, que são:\n')
