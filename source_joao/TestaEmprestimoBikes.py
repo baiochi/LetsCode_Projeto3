@@ -1,5 +1,6 @@
 # ambiente de testes unitários
 import unittest
+import math
 from my_class import Cliente, Loja
 from datetime import datetime as dt
 
@@ -121,8 +122,76 @@ class LojaTests(unittest.TestCase):
             self.loja.receberPedido(cliente = self.loja.cadastroClientes[0], quantidade = 1, \
                 modeloAluguel = 'hora', promocaoFamilia = True)
 
-    def testeRecebePedidoPromocaoValida(self):
-        pass
+    def testecalcularContaHora(self): # OK
+        
+        # já testa os dois casos, com ou sem promocao
+        for promocao in (False, True):
+            quantidade = 3
+            modeloAluguel = 'hora'
+            dataAluguel = dt(2021,8,29, 12, 15, 0)  #12:15:00
+            dataAtual = dt(2021,8,29, 15, 15, 0)    #15:15:00
+            aluguel = {
+                    'cliente': Cliente(nome = 'joao', cpf = '123.456.789-00'),
+                    'quantidade': quantidade,
+                    'modeloAluguel': modeloAluguel,
+                    'dataAluguel': dataAluguel,
+                    'promocaoFamilia': promocao
+                }
+            valorTestado = self.loja.calcularConta(aluguel = aluguel, debug = True, dataAtual = dataAtual)
+            # 3 biciletas * 3 horas * 5 reais/hora
+            valorEsperado = quantidade * (dataAtual.hour - dataAluguel.hour) * 5
+            # aplica a promocao se true
+            if promocao: valorEsperado *= 0.7
+            # verifica se o valor foi calculado corretamente
+            self.assertEqual(valorTestado, valorEsperado) 
+
+    def testecalcularContaDia(self, promocao = False): # OK
+
+        # já testa os dois casos, com ou sem promocao
+        for promocao in (False, True):
+            quantidade = 3
+            modeloAluguel = 'dia'
+            dataAluguel = dt(2021,8,28, 15, 15, 0)  #28/08/2021
+            dataAtual = dt(2021,8,30, 12, 15, 0)    #30/08/2021
+            aluguel = {
+                    'cliente': Cliente(nome = 'joao', cpf = '123.456.789-00'),
+                    'quantidade': quantidade,
+                    'modeloAluguel': modeloAluguel,
+                    'dataAluguel': dataAluguel, 
+                    'promocaoFamilia': promocao
+                }
+            
+            valorTestado = self.loja.calcularConta(aluguel = aluguel, debug = True, dataAtual = dataAtual) #30/08/2021
+            # 3 biciletas * 2 dias * 25 reais/dia
+            valorEsperado = quantidade * (dataAtual.day - dataAluguel.day) * 25
+            # aplica a promocao se true
+            if promocao: valorEsperado *= 0.7
+            # verifica se o valor foi calculado corretamente
+            self.assertEqual(valorTestado, valorEsperado) 
+
+    def testecalcularContaSemana(self, promocao = False): # OK
+
+        # já testa os dois casos, com ou sem promocao
+        for promocao in (False, True):
+            quantidade = 3
+            modeloAluguel = 'semana'
+            dataAluguel = dt(2021,9,11, 15, 15, 0)  #11/09/2021
+            dataAtual = dt(2021,8,29, 12, 15, 0)    #29/08/2021
+            aluguel = {
+                    'cliente': Cliente(nome = 'joao', cpf = '123.456.789-00'),
+                    'quantidade': quantidade,
+                    'modeloAluguel': modeloAluguel,
+                    'dataAluguel': dataAluguel,  #11/09/2021
+                    'promocaoFamilia': promocao
+                }
+            
+            valorTestado = self.loja.calcularConta(aluguel = aluguel, debug = True, dataAtual = dataAtual) #29/08/2021
+            # 3 biciletas * 2,5 semanas * 100 reais/semana
+            valorEsperado = quantidade * math.ceil((dataAtual.day - dataAluguel.day)/7) * 100
+            # aplica a promocao se true
+            if promocao: valorEsperado *= 0.7
+            # verifica se o valor foi calculado corretamente
+            self.assertEqual(valorTestado, valorEsperado) 
 
     def testeRecebePedidoInvalido(self):
         pass

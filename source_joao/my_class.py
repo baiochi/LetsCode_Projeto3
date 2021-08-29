@@ -102,9 +102,10 @@ class Loja(object):
         return self.calcularConta(aluguel)
 
     # Faz o cálculo de acordo com a modalidade e tempo do aluguel
-    def calcularConta(self, aluguel):
+    def calcularConta(self, aluguel, debug = False, dataAtual = dt.now()):
         # extrai a data atual
-        dataAtual = dt.now()
+        if debug:
+            dataAtual = dataAtual
 
         # Calculo para a modalidade R$5/hora
         if aluguel['modeloAluguel'] == 'hora':
