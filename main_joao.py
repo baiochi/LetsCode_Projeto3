@@ -13,39 +13,19 @@ com 30% de desconto no valor total.
 
 class Cliente(object):
 
-    def __init__(self, nome):
+    def __init__(self, nome, cpf):
         self.nome = nome
+        self.cpf = cpf
 
-    # Ver as bicicletas disponíveis na Loja;
-    def verBiciletas(self, loja):
-        return loja.estoque
+    # Retorna o nome do cliente
+    def getNome(self):
+        return self.nome
+    # Retorna o CPF do cliente
+    def getCPF(self):
+        return self.cpf
 
-    # Alugar bicicletas por hora (R$5/hora), dia (R$25/dia), semana (R$100/semana)
-    # Opcional: promoção que pode incluir de 3 a 5 aluguéis com 30% de desconto no valor total.
-    def alugarBicicleta(self, loja, quantidade, modeloAluguel, promocaoFamilia = False):
-        try:
-            # Verificar o estoque
-            if quantidade > loja.estoque:
-                raise ValueError('Estoque insuficiente.')
-            # Validar o modelo do aluguel
-            if modeloAluguel not in ['dia', 'hora', 'semana']:
-                raise Exception('Modelo de alguel inválido.')
-            # Validar da promoção
-            if promocaoFamilia and not 3 <= quantidade <= 5:
-                self.promocaoFamilia = False # reseta a varíável para evitar bug em chamadas futuras
-                raise Exception('Quantidade inválida para validar a promoção.')
-
-            loja.aumentarEstoque(quantidade)
-            self.qtdeBicicletas = quantidade # atualiza quantidade de bicicletas que o cliente alugou
-            self.modeloAluguel = modeloAluguel # define o modelo do empréstimo
-            self.dataAluguel = dt.today() # registra a data/horário do aluguel
-            print(f'{quantidade} bicileta(s) alugada(s) por R${loja.tabelaPrecos[modeloAluguel]}/{modeloAluguel}\
-                 as {self.dataAluguel.strftime("%H:%M:%S")} no dia {self.dataAluguel.strftime("%d/%m/%y")}') #log
-
-        except ValueError:
-            print('Estoque insuficiente.')
-        except Exception:
-            print('Dado inválido.')
+    # Como o cliente ficou praticamente sem atributos, podemos adicionar outras variáveis,
+    # por exemplo, CPF (atuando como ID), telefone, endereco etc...
 
 """
 Loja pode:
@@ -65,7 +45,7 @@ class Loja(object):
             'semana' : 100
         } 
         # recebe dicionario: cliente, quantidade, modeloAluguel, dataAluguel, promocaoFamilia
-        self.historicoAluguel = [] 
+        self.historicoAluguel = []
 
     
     # Mostrar o estoque de bicicletas;
@@ -76,37 +56,51 @@ class Loja(object):
 
     # Calcular a conta quando o cliente decidir devolver a bicicleta;
     def calcularConta(self, cliente):
-        if cliente.modeloAluguel == 'hora':
+        # extrair o dicionário referente ao aluguel do cliente:
+        # versao "normal":
+        for item in self.historicoAluguel:
+            if item['client'].getName() == cliente.getName():
+                aluguel = item
+        print(aluguel['client'].getName())
+        # versao list comprehension
+        #aluguelLc = [aluguel for aluguel in self.historicoAluguel if aluguel['client'].getName() == cliente.getName()]
+        #print(aluguelLc[0]['client'].getName())
+
+        if aluguel['modeloAluguel'] == 'hora':
             dataAtual = dt.now()
             # calcula os minutos
-            minutos = dataAtual.minute - cliente.dataAluguel.minute
+            minutos = dataAtual.minute - aluguel['dataAluguel'].minute
             if minutos < 0: minutos += 60 # evita deixar os minutos em negativos
             # calcula as horas
-            horas = dataAtual.hour - cliente.dataAluguel.hour
+            horas = dataAtual.hour - aluguel['dataAluguel'].hour
             # soma final, computando os minutos excedentes
             tempoAluguel = (horas + (minutos/60)).__round__()
             # calcula o valor
             valorAluguel = tempoAluguel * 5
-            print(f'hora da devolucao: {dataAtual.strftime("%H:%M:%S")}, hora do aluguel: {cliente.dataAluguel.strftime("%H:%M:%S")}') #log
+            # log
+            print(f'hora da devolucao: {dataAtual.strftime("%H:%M:%S")}, \
+                hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")}')
             return valorAluguel
 
-        if cliente.modeloAluguel == 'dia':
+        if aluguel['modeloAluguel'] == 'dia':
             dataAtual = dt.now()
-            tempoAluguel = dataAtual.day - cliente.dataAluguel.day
+            tempoAluguel = dataAtual.day - aluguel['dataAluguel'].day
             valorAluguel = tempoAluguel * 25
-            print(f'Data da devolucao: {dataAtual.strftime("%d/%m/%y")}, data do aluguel: {cliente.dataAluguel.strftime("%d/%m/%y")}') #log
+            print(f'Data da devolucao: {dataAtual.strftime("%d/%m/%y")}, \
+                data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
             return valorAluguel
 
-        if cliente.modeloAluguel == 'semana':
+        if aluguel['modeloAluguel'] == 'semana':
             dataAtual = dt.now()
-            tempoAluguel = (dataAtual.day - cliente.dataAluguel.day)/7
+            tempoAluguel = (dataAtual.day - aluguel['dataAluguel'].day)/7
             tempoAluguel = tempoAluguel // 1 # arredonda o número
             valorAluguel = tempoAluguel * 100
-            print(f'Data da devolucao: {dataAtual.strftime("%d/%m/%y")}, data do aluguel: {cliente.dataAluguel.strftime("%d/%m/%y")}') #log
+            print(f'Data da devolucao: {dataAtual.strftime("%d/%m/%y")}, \
+                data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
             return valorAluguel
         pass
 
-    #- Receber pedidos de aluguéis por hora, diários ou semanais validando a possibilidade com o estoque.
+    # Receber pedidos de aluguéis por hora, diários ou semanais validando a possibilidade com o estoque.
     def receberPedido(self, cliente, quantidade, modeloAluguel, promocaoFamilia = False):
         try:
             # Verificar o estoque
@@ -122,7 +116,7 @@ class Loja(object):
             
             # monta o dicionario referente ao aluguel
             aluguel = {
-                'cliente': cliente.nome,
+                'cliente': cliente,
                 'quantidade': quantidade,
                 'modeloAluguel': modeloAluguel,
                 'dataAluguel': dt.today(),
