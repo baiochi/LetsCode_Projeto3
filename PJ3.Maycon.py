@@ -1,4 +1,5 @@
 import datetime
+import pendulum 
 
 class Cliente(object):
     def __init__(self, nome):
@@ -29,7 +30,7 @@ class Cliente(object):
             print('Você deseja alugar {} bicicletas, mas a loja só tem {}'.format(self.quantidadeAlugada, loja.estoque))
             self.alugar(loja)               
     
-    def devolver(self, loja, cliente):
+    def devolver(self, loja, nome):
         try:
             self.quantidadeDevolvida = int(input('Informe a quantidade de bicicletas que deseja devolver: '))
             if self.quantidadeDevolvida > self.quantidadeAlugada:
@@ -38,56 +39,50 @@ class Cliente(object):
             dia = int(input('Informe o dia da devolução: '))
             self.horaFinal = int(input('Informe a hora da devolução: '))
             self.dataFinal = datetime.datetime(2021, mes, dia)
-            loja.conta(cliente)
-            self.quantidadeAlugada -= self.quantidadeDevolvida
-            loja.estoque += self.quantidadeDevolvida
         except ValueError:
             print('Você alugou: {} bicicletas, e deseja devolver {}.\
                  informe um valor valido'.format(self.quantidadeAlugada, self.quantidadeDevolvida))
 
 
 class Loja(object):
-
-
     def __init__(self):
         self.estoque = 15
-    
 
     def conta(self, cliente):
-
+        dias = (pendulum.period(cliente.dataInicial, cliente.dataFinal).days)
         if cliente.horaFinal < cliente.horaInicial:
             horas = cliente.horaFinal
             horas += (24 - cliente.horaInicial)
+            dias -= 1
         else:
             horas = cliente.horaFinal - cliente.horaInicial
         horasAluguel = horas        #Distinção entre as horas para calculo e horas alugadas reais
-        dias = cliente.dataFinal - cliente.dataInicial
         diasAluguel = dias
         if horas >= 5:
             dias += 1
             horas = 0
         semanas = dias // 7
         semanasAluguel = diasAluguel // 7
-        dias = dias%7
-        diasAluguel = diasAluguel % 7
+        dias -= (semanas * 7)
+        diasAluguel = diasAluguel - (semanasAluguel* 7)
         if dias >= 4:
             semanas += 1
             dias = 0
-
         fatorCobranca = (semanas * 100) + (dias * 25) + (horas * 5)
-        if cliente.quantidadeAlugada > 3 and cliente.quantidadeAlugada < 5:
-            descontoFamilia = 0,3
+        if cliente.quantidadeAlugada > 2 and cliente.quantidadeAlugada < 6:
+            descontoFamilia = 30
         else:
             descontoFamilia = 0
-        valorCobranca = fatorCobranca * cliente.quantidadeDevolvida
-        valorDesconto = valorCobranca * descontoFamilia
-        valorPagar = valorCobranca - valorDesconto
-        
+        valorCobranca = int(fatorCobranca * cliente.quantidadeDevolvida)
+        valorDesconto = round(float(valorCobranca * (descontoFamilia/100)),2)
+        valorPagar = int(valorCobranca - valorDesconto)
         print(f'Você devolveu {cliente.quantidadeDevolvida} bicicletas, de um total de {cliente.quantidadeAlugada} bicicletas alugadas!')
         print(f'Periodo de locação: {semanasAluguel} semanas, {diasAluguel} dias e {horasAluguel} horas')
         print(f'O valor total: R$ {valorCobranca}')
-        print(f'Desconto de aluguel familia ({descontoFamilia}): R$ {valorDesconto}')
+        print(f'Desconto de aluguel familia ({descontoFamilia}%): -R$ {valorDesconto}')
         print(f'Valor a pagar: R$ {valorPagar}')
+        cliente.quantidadeAlugada -= cliente.quantidadeDevolvida
+        self.estoque += cliente.quantidadeDevolvida
 
     
 
@@ -101,13 +96,15 @@ print('Criando Loja e Clientes!')
 matriz = Loja()
 clienteA = Cliente('Sr.Zé')
 clienteB = Cliente('Sr.Jão')
-#print('Consulta de estoque e aluguel Sr.Zé!')
-#clienteA.disponivel(matriz)
-#clienteA.alugar(matriz)
-#print('Consulta de estoque e aluguel Sr.Jão!')
-#clienteB.disponivel(matriz)
-#clienteB.alugar(matriz)
+print('Consulta de estoque e aluguel Sr.Zé!')
+clienteA.disponivel(matriz)
+clienteA.alugar(matriz)
+print('Consulta de estoque e aluguel Sr.Jão!')
+clienteB.disponivel(matriz)
+clienteB.alugar(matriz)
 print('Devolução de bicicletas Sr.Zé e Sr.Jão')
 clienteA.devolver(matriz, clienteA)
+matriz.conta(clienteA)
 clienteB.disponivel(matriz)
 clienteB.devolver(matriz, clienteB)
+matriz.conta(clienteB)
