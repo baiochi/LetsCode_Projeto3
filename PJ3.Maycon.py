@@ -22,9 +22,8 @@ class Cliente(object):
                 raise ValueError
             mes = int(input('Informe o mês do aluguel: '))
             dia = int(input('Informe o dia do aluguel: '))
-            self.dataInicial = datetime.date(2021, mes, dia)
-            hora = int(input('Informe a hora Inicial: '))
-            self.horaInicial = datetime.time(hora, 0)  
+            self.horaInicial = int(input('Informe a hora Inicial: '))
+            self.dataInicial = datetime.datetime(2021, mes, dia)
         except ValueError:
             print('Você deseja alugar {} bicicletas, mas a loja só tem {}'.format(self.quantidadeAlugada, loja.estoque))
             self.alugar(loja)               
@@ -36,38 +35,69 @@ class Cliente(object):
                 raise ValueError
             mes = int(input('Informe o mês da devolução: '))
             dia = int(input('Informe o dia da devolução: '))
-            self.dataFinal = datetime.date(2021, mes, dia)
             self.horaFinal = int(input('Informe a hora da devolução: '))
-            loja.conta('informar parametros necessarios')
+            self.dataFinal = datetime.datetime(2021, mes, dia)
+            loja.conta(cliente)
+            self.quantidadeAlugada -= self.quantidadeDevolvida
         except ValueError:
             print('Você alugou: {} bicicletas, e deseja devolver {}. informe um valor valido'.format(self.quantidadeAlugada, self.quantidadeDevolvida)
 
-    
+
+
+
+
 class Loja(object):
+
+
     def __init__(self):
         self.estoque = 100
     
-    def conta(self, cliente):
-        horas = cliente.horaFinal - cliente.horaInicial
+
+    def conta(self, cliente, quantidade):
+
+        if cliente.horaFinal < cliente.horaInicial:
+            horas = cliente.horaFinal
+            horas += (24 - cliente.horaInicial)
+        else:
+            horas = cliente.horaFinal - cliente.horaInicial
+        horasAluguel = horas        #Distinção entre as horas para calculo e horas alugadas reais
         dias = cliente.dataFinal - cliente.dataInicial
-        dias += horas // 24
-        if horas > 5:
+        diasAluguel = dias
+        if horas >= 5:
             dias += 1
+            horas = 0
         semanas = dias // 7
-            
+        semanasAluguel = diasAluguel // 7
+        dias = dias % 7
+        diasAluguel = diasAluguel % 7
+        if dias >= 4:
+            semanas += 1
+            dias = 0
 
-    
-
-        quantidade = cliente.quantidadeDevolvida
-        valorAPagar = 
-        # Calcular a conta quando o cliente decidir devolver a bicicleta;
-        # Mostrar o estoque de bicicletas;
-        # Receber pedidos de aluguéis por hora, diários ou semanais validando a possibilidade com o estoque.
-    
+        fatorCobranca = (semanas * 100) + (dias * 25) + (horas * 5)
+        if cliente.quantidadeAlugada > 3 and cliente.quantidadeAlugada < 5:
+            descontoFamilia = 30%
+        else:
+            descontoFamilia = 0%
+        valorCobranca = fatorCobranca * cliente.quantidadeDevolvida
+        valorDesconto = valorCobranca * descontoFamilia
+        valorPagar = valorCobranca - DescontoFamilia
         
+        print(f'Você devolveu {cliente.quantidadeDevolvida} bicicletas, de um total de {cliente.quantidadeAlugada} bicicletas alugadas!')
+        print(f'Periodo de locação: {semanasAluguel} semanas, {diasAluguel} dias e {horasAluguel} horas')
+        print(f'O valor total: R$ {valorCobranca}')
+        print(f'Desconto de aluguel familia ({descontoFamilia}): R$ {valorDesconto}')
+        print(f'Valor a pagar: R$ {valorPagar}')
+
+    
+
+# Calcular a conta quando o cliente decidir devolver a bicicleta;
+# Mostrar o estoque de bicicletas;
+# Receber pedidos de aluguéis por hora, diários ou semanais validando a possibilidade com o estoque.        
 # Simulação de alugueis:
 
 
-Matriz = Loja()
-cliente1 = Cliente('jose')
-cliente.disponivel(Matriz)
+matriz = Loja()
+clienteA = Cliente()
+clienteA.disponivel(matriz)
+clienteA.alugar
