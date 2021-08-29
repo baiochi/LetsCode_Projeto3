@@ -51,21 +51,29 @@ class Loja(object):
     # Mostrar o estoque de bicicletas;
     def mostrarEstoque(self):
         return self.estoque
-
-    # aumentarEstoque() e diminuirEstoque() removidos, pois ficaram sem uso
-
-    # Calcular a conta quando o cliente decidir devolver a bicicleta;
-    def calcularConta(self, cliente):
+    
+    # Finaliza o aluguel, atualizando o estoque e retornando o valor da conta
+    def devolverBicicletas(self, cliente):
         # extrair o dicionário referente ao aluguel do cliente:
         # versao "normal":
         for item in self.historicoAluguel:
             if item['client'].getName() == cliente.getName():
                 aluguel = item
-        print(aluguel['client'].getName())
+        #print(aluguel['client'].getName())
+        
         # versao list comprehension
-        #aluguelLc = [aluguel for aluguel in self.historicoAluguel if aluguel['client'].getName() == cliente.getName()]
-        #print(aluguelLc[0]['client'].getName())
+        #aluguel = [aluguel for aluguel in self.historicoAluguel if aluguel['client'].getName() == cliente.getName()]
+        #print(aluguel[0]['client'].getName())
 
+        # atualiza o estoque
+        self.estoque += aluguel['quantidade']
+        # faz a chama do método e retorna o valor do aluguel
+        return self.calcularConta(aluguel)
+
+    # Faz o cálculo de acordo com a modalidade e tempo do aluguel
+    def calcularConta(self, aluguel):
+
+        # Calculo para a modalidade R$5/hora
         if aluguel['modeloAluguel'] == 'hora':
             dataAtual = dt.now()
             # calcula os minutos
@@ -76,32 +84,44 @@ class Loja(object):
             # soma final, computando os minutos excedentes
             tempoAluguel = (horas + (minutos/60)).__round__()
             # calcula o valor
-            valorAluguel = tempoAluguel * 5
+            valorAluguel = tempoAluguel * self.tabelaPrecos['hora'] # 5
+            # validação da promoção (desconto 30%)
+            if aluguel['promocaoFamilia']: valorAluguel *= 0.7
             # log
-            print(f'hora da devolucao: {dataAtual.strftime("%H:%M:%S")}, \
-                hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")}')
+            print(f'CLiente: {aluguel["client"].getName()}, Hora da devolucao: {dataAtual.strftime("%H:%M:%S")}, \
+                Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")}')
             return valorAluguel
 
-        if aluguel['modeloAluguel'] == 'dia':
+        # Calculo para a modalidade R$25/dia
+        elif aluguel['modeloAluguel'] == 'dia':
             dataAtual = dt.now()
             tempoAluguel = dataAtual.day - aluguel['dataAluguel'].day
-            valorAluguel = tempoAluguel * 25
-            print(f'Data da devolucao: {dataAtual.strftime("%d/%m/%y")}, \
-                data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
+            valorAluguel = tempoAluguel * self.tabelaPrecos['dia'] # 25
+            # validação da promoção (desconto 30%)
+            if aluguel['promocaoFamilia']: valorAluguel *= 0.7
+            # log
+            print(f'CLiente: {aluguel["client"].getName()}, Data da devolucao: {dataAtual.strftime("%d/%m/%y")}, \
+                Data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
             return valorAluguel
 
-        if aluguel['modeloAluguel'] == 'semana':
+        # Calculo para a modalidade R$100/hora
+        elif aluguel['modeloAluguel'] == 'semana':
             dataAtual = dt.now()
-            tempoAluguel = (dataAtual.day - aluguel['dataAluguel'].day)/7
+            tempoAluguel = (dataAtual.day - aluguel['dataAluguel'].day) / 7
             tempoAluguel = tempoAluguel // 1 # arredonda o número
-            valorAluguel = tempoAluguel * 100
-            print(f'Data da devolucao: {dataAtual.strftime("%d/%m/%y")}, \
-                data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
+            valorAluguel = tempoAluguel * self.tabelaPrecos['semana'] # 100
+            # validação da promoção (desconto 30%)
+            if aluguel['promocaoFamilia']: valorAluguel *= 0.7
+            # log
+            print(f'CLiente: {aluguel["client"].getName()}, Data da devolucao: {dataAtual.strftime("%d/%m/%y")}, \
+                Data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
             return valorAluguel
-        pass
 
     # Receber pedidos de aluguéis por hora, diários ou semanais validando a possibilidade com o estoque.
-    def receberPedido(self, cliente, quantidade, modeloAluguel, promocaoFamilia = False):
+    # Dois últimos parâmetros reservados para teste
+    def receberPedido(self, cliente, quantidade, modeloAluguel,\
+        promocaoFamilia = False, debug = False, *dataTeste):
+
         try:
             # Verificar o estoque
             if quantidade > self.estoque:
@@ -115,13 +135,22 @@ class Loja(object):
                 raise Exception('Quantidade inválida para validar a promoção.')
             
             # monta o dicionario referente ao aluguel
-            aluguel = {
-                'cliente': cliente,
-                'quantidade': quantidade,
-                'modeloAluguel': modeloAluguel,
-                'dataAluguel': dt.today(),
-                'promocaoFamilia': promocaoFamilia
-            }
+            if debug:
+                aluguel = {
+                    'cliente': cliente,
+                    'quantidade': quantidade,
+                    'modeloAluguel': modeloAluguel,
+                    'dataAluguel': dataTeste[0],
+                    'promocaoFamilia': promocaoFamilia
+                }
+            else:
+                aluguel = {
+                    'cliente': cliente,
+                    'quantidade': quantidade,
+                    'modeloAluguel': modeloAluguel,
+                    'dataAluguel': dt.today(),
+                    'promocaoFamilia': promocaoFamilia
+                }
 
             # diminue o estoque
             self.estoque -= quantidade
