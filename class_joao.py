@@ -17,6 +17,14 @@ class Cliente(object):
     def __init__(self, nome, cpf):
         self.nome = nome
         self.cpf = cpf
+    
+    # método mágico que representa a classe
+    def __repr__(self):
+        # verifica a existencia dos atributos da classe
+        if(hasattr(self, 'nome') and hasattr(self, 'cpf')):
+            return f'Nome: {self.nome}; CPF: {self.cpf}'
+        else:
+            return 'Dados inválido dos cliente.'
 
     # Retorna o nome do cliente
     def getNome(self):
@@ -47,6 +55,16 @@ class Loja(object):
         } 
         # recebe dicionario: cliente, quantidade, modeloAluguel, dataAluguel, promocaoFamilia
         self.historicoAluguel = []
+    
+    # método mágico que representa a classe
+    def __repr__(self):
+        # verifica a existencia dos atributos da classe
+        if(hasattr(self, 'estoque') and hasattr(self, 'tabelaPrecos') and hasattr(self, 'historicoAluguel')):
+            print(f'Estoque: {self.estoque}.\n')
+            print(f'Tabela de Preços: {self.tabelaPrecos}\n')   # aprimorar a formatação
+            print(f'Histórico dos Aluguéis: {self.estoque}')    # aprimorar a formatação
+        else:
+            return 'Dados inválidos da Loja.'
 
     
     # Mostrar o estoque de bicicletas;
