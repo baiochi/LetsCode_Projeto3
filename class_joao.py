@@ -47,15 +47,17 @@ class Loja(object):
 
     def __init__(self, estoque):
         self.estoque = estoque
+        # recebe dicionario: cliente, quantidade, modeloAluguel, dataAluguel, promocaoFamilia
+        self.historicoAluguel = []
+        # armazena clientes cadastrados
+        self.cadastroClientes = []
         # dados da tabela de preco são usados para calcular o custo do aluguel e definir modelo do aluguel
         self.tabelaPrecos = {
             'hora' : 5,
             'dia' : 25,
             'semana' : 100
         } 
-        # recebe dicionario: cliente, quantidade, modeloAluguel, dataAluguel, promocaoFamilia
-        self.historicoAluguel = []
-    
+        
     # método mágico que representa a classe
     def __repr__(self):
         # verifica a existencia dos atributos da classe
@@ -66,7 +68,17 @@ class Loja(object):
         else:
             return 'Dados inválidos da Loja.'
 
-    
+    # cadastrar cliente
+    def cadastraCliente(self, cliente):
+        # verificar se cliente já existe
+        #for item in self.cadastroClientes:
+        #    if cliente.getCPF() == item.getCPF():
+        #        print(item)
+        if [item for item in self.cadastroClientes if cliente.getCPF() == item.getCPF()]:
+            raise ValueError('Cliente já cadastrado.')
+
+        self.cadastroClientes.append(cliente)
+
     # Mostrar o estoque de bicicletas;
     def mostrarEstoque(self):
         return self.estoque
@@ -143,51 +155,50 @@ class Loja(object):
     # Dois últimos parâmetros reservados para teste
     def receberPedido(self, cliente, quantidade, modeloAluguel,\
         promocaoFamilia = False, debug = False, dataTeste = dt.today()):
+        #try:
+        # Verificar o estoque
+        if quantidade > self.estoque:
+            raise ValueError('Estoque insuficiente.')
+        # Validar o modelo do aluguel (tabelaPrecos.keys() = ['hora', 'dia', 'semana'])
+        if modeloAluguel not in self.tabelaPrecos.keys():
+            raise NameError('Modelo de alguel inválido.')
+        # Validar da promoção
+        if promocaoFamilia and not 3 <= quantidade <= 5:
+            self.promocaoFamilia = False # reseta a varíável para evitar bug em chamadas futuras
+            raise TypeError('Quantidade inválida para validar a promoção.')
+        
+        # monta o dicionario referente ao aluguel
+        if debug:
+            aluguel = {
+                'cliente': cliente,
+                'quantidade': quantidade,
+                'modeloAluguel': modeloAluguel,
+                'dataAluguel': dataTeste,
+                'promocaoFamilia': promocaoFamilia
+            }
+        else:
+            aluguel = {
+                'cliente': cliente,
+                'quantidade': quantidade,
+                'modeloAluguel': modeloAluguel,
+                'dataAluguel': dt.today(),
+                'promocaoFamilia': promocaoFamilia
+            }
 
-        try:
-            # Verificar o estoque
-            if quantidade > self.estoque:
-                raise ValueError('Estoque insuficiente.')
-            # Validar o modelo do aluguel (tabelaPrecos.keys() = ['hora', 'dia', 'semana'])
-            if modeloAluguel not in self.tabelaPrecos.keys():
-                raise NameError('Modelo de alguel inválido.')
-            # Validar da promoção
-            if promocaoFamilia and not 3 <= quantidade <= 5:
-                self.promocaoFamilia = False # reseta a varíável para evitar bug em chamadas futuras
-                raise TypeError('Quantidade inválida para validar a promoção.')
-            
-            # monta o dicionario referente ao aluguel
-            if debug:
-                aluguel = {
-                    'cliente': cliente,
-                    'quantidade': quantidade,
-                    'modeloAluguel': modeloAluguel,
-                    'dataAluguel': dataTeste,
-                    'promocaoFamilia': promocaoFamilia
-                }
-            else:
-                aluguel = {
-                    'cliente': cliente,
-                    'quantidade': quantidade,
-                    'modeloAluguel': modeloAluguel,
-                    'dataAluguel': dt.today(),
-                    'promocaoFamilia': promocaoFamilia
-                }
+        # diminue o estoque
+        self.estoque -= quantidade
+        # amazena os dados do aluguel
+        self.historicoAluguel.append(aluguel) 
+        # log
+        print(f'[log] {quantidade} bicileta(s) alugada(s) por R${self.tabelaPrecos[modeloAluguel]}/{modeloAluguel}',
+                f'as {aluguel["dataAluguel"].strftime("%H:%M:%S")}',
+                f'no dia {aluguel["dataAluguel"].strftime("%d/%m/%y")}')
 
-            # diminue o estoque
-            self.estoque -= quantidade
-            # amazena os dados do aluguel
-            self.historicoAluguel.append(aluguel) 
-            # log
-            print(f'[log] {quantidade} bicileta(s) alugada(s) por R${self.tabelaPrecos[modeloAluguel]}/{modeloAluguel}',
-                    f'as {aluguel["dataAluguel"].strftime("%H:%M:%S")}',
-                    f'no dia {aluguel["dataAluguel"].strftime("%d/%m/%y")}')
-
-        except ValueError:
+        """except ValueError:
             print('Estoque insuficiente!\n')
         except NameError:
             print('Modelo de alguel inválido!\n')
         except TypeError:
-            print('Promoção não aplicável!\n')
+            print('Promoção não aplicável!\n')"""
 
 
