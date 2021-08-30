@@ -58,39 +58,35 @@ class LojaTests(unittest.TestCase):
         self.loja = Loja(estoque = 10)
     
     def testeCadastrarCliente(self): #OK
-        print("Testando o cadastro de cliente:")
-        self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        print("Testando o cadastro de cliente:\n")
+        self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
         self.assertIsNotNone(self.loja.cadastroClientes) # verifica se a lista está vazia
 
     def testeCadastrarClienteDuplicado(self): #OK
-        print("Testando o cadastro de cliente em duplicata:")
+        print("Testando o cadastro de cliente em duplicata:\n")
         # adiciona o cliente pela primeira vez
         self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
-
         # passa no teste se acontecer o erro esperado dentro do método cadastraCliente()
         with self.assertRaises(ValueError):
             # tenta adicionar pela segunda vez
             self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
     
     def testeRecebePedido(self): #OK
-        # adiciona o cliente
-        self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        print("Testando :\n")
         # faz o pedido
-        self.loja.receberPedido(cliente = self.loja.cadastroClientes[0], quantidade = 1, modeloAluguel = 'hora')
+        self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, modeloAluguel = 'hora')
         # verifica se o histórico de aluguel está vazio
         self.assertIsNotNone(self.loja.historicoAluguel)
-        # raise TypeError('Quantidade inválida para validar a promoção.')
-        pass
 
     def testeVerificarEstoqueDiminuiu(self): #OK
-        # adiciona o cliente
-        self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        print("Testando :\n")
         # faz o pedido
-        self.loja.receberPedido(cliente = self.loja.cadastroClientes[0], quantidade = 5, modeloAluguel = 'hora')
+        self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'hora')
         # verifica se o estoque foi atualizado
         self.assertEqual(self.loja.estoque, 5)
 
     def testeVerificarEstoqueAumentou(self): #OK
+        print("Testando verificar se o estoque aumentou após devolucao:\n")
         # adiciona o cliente
         self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
         # faz o pedido
@@ -101,28 +97,26 @@ class LojaTests(unittest.TestCase):
         self.assertEqual(self.loja.estoque, 10)
 
     def testeRecebePedidoSemEstoque(self): #OK
-        # adiciona o cliente
-        self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        print("Testando receber pedidos sem o estoque:\n")
         # faz o pedido sem o estoque necessario
         with self.assertRaises(ValueError):
-            self.loja.receberPedido(cliente = self.loja.cadastroClientes[0], quantidade = 3650, modeloAluguel = 'hora')
+            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 3650, modeloAluguel = 'hora')
 
     def testeModeloAluguelInvalido(self): #OK
-        # adiciona o cliente
-        self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        print("Testando receber pedido com moelo de aluguel inválido:\n")
         # tenta usar a modalidade do aluguel em minutos
         with self.assertRaises(NameError):
-            self.loja.receberPedido(cliente = self.loja.cadastroClientes[0], quantidade = 5, modeloAluguel = 'minutos')
+            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'minutos')
 
     def testeRecebePedidoPromocaoInvalida(self): #OK
-        # adiciona o cliente
-        self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        print("Testando receber pedido com promocao inválida:\n")
         # tenta dar o migué da promocao
         with self.assertRaises(TypeError):
-            self.loja.receberPedido(cliente = self.loja.cadastroClientes[0], quantidade = 1, \
+            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, \
                 modeloAluguel = 'hora', promocaoFamilia = True)
 
     def testecalcularContaHora(self): # OK
+        print("Testando calculo da conta na modalidade Hora:\n")
         
         # já testa os dois casos, com ou sem promocao
         for promocao in (False, True):
@@ -143,9 +137,10 @@ class LojaTests(unittest.TestCase):
             # aplica a promocao se true
             if promocao: valorEsperado *= 0.7
             # verifica se o valor foi calculado corretamente
-            self.assertEqual(valorTestado, valorEsperado) 
+            self.assertEqual(valorTestado, valorEsperado)
 
-    def testecalcularContaDia(self, promocao = False): # OK
+    def testecalcularContaDia(self): # OK
+        print("Testando calculo da conta na modalidade Dia:\n")
 
         # já testa os dois casos, com ou sem promocao
         for promocao in (False, True):
@@ -169,7 +164,8 @@ class LojaTests(unittest.TestCase):
             # verifica se o valor foi calculado corretamente
             self.assertEqual(valorTestado, valorEsperado) 
 
-    def testecalcularContaSemana(self, promocao = False): # OK
+    def testecalcularContaSemana(self): # OK
+        print("Testando calculo da conta na modalidade Semana:\n")
 
         # já testa os dois casos, com ou sem promocao
         for promocao in (False, True):

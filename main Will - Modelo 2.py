@@ -114,7 +114,10 @@ while entrada != 'END':
 
     elif entrada == 'C':
         print('\nConferir o clientes com locações ativas foi selecionado!')
-        print(f'{loja.locacoes.items()}\n')
+        if not loja.locacoes:
+            print('Não há locações registradas.\n')
+        else:
+            print(f'{loja.locacoes.items()}\n')
         entrada = validaEntrada(opcoesSistema())
 
     elif entrada == "L":
