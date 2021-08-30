@@ -190,12 +190,6 @@ class LojaTests(unittest.TestCase):
             # verifica se o valor foi calculado corretamente
             self.assertEqual(valorTestado, valorEsperado) 
 
-    def testeRecebePedidoInvalido(self):
-        pass
-
-    def testeDevolverBicicletas(self):
-        pass
-
 
 # Este método executa todos os testes das classes anteriores
 if __name__ == '__main__':
