@@ -1,6 +1,44 @@
 from my_class import Cliente, Loja
 from datetime import datetime as dt
 
+
+"""
+classe Cliente:
+    atributos:
+    - nome: str
+    - cpf: str
+    métodos:
+    - getNome() : retorna o atributo 'nome'
+    - getCPF() : retorna o atributo 'cpf'
+
+classe Loja:
+    atributos:
+    - estoque: int
+    - historicoAluguel: lista de dicionários 'aluguel'
+        aluguel = {
+            'cliente' : Cliente(),
+            'quantidade' : int,
+            'modeloAluguel': str,       opcoes('hora','dia','semana')
+            'dataAluguel': datetime
+        }
+    - cadastroCliente: lista de objetos Cliente()
+    - tabelaPrecos: dicionário = {
+                'hora' : 5,
+                'dia' : 25,
+                'semana' : 100
+        }
+
+    métodos:
+    - cadastraCliente(cliente = Cliente()): recebe objeto Cliente() e armazena na lista cadastroCliente
+    - mostrarEstoque(): retorna o estoque
+    - receberPedido(cliente = Cliente(), quantidade = int, modeloAluguel = str, promocaoFamilia = bool):
+        recebe o objeto Cliente(), a quantidade de bicicletas, o modelo do aluguel ('hora','dia','semana') e True caso for promocao
+        aluguel é armazenado na lista historicoAluguel e diminui o valor do estoque
+    - devolverBicicletas(cliente = Cliente()): usa o objeto Cliente() para buscar na base historicoAluguel, diminue o valor do estoque
+        retorno faz a chamada do método calcularConta()
+    - calcularConta(aluguel): recebe um dicionário contendo as informacoes referentes ao aluguel e retorna o valor total
+
+"""
 # incializando as classes
 cliente1 = Cliente('Joao', '123.456.789-00')
 cliente2 = Cliente('Maycon', '321.654.987-00')
