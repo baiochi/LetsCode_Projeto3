@@ -56,115 +56,115 @@ class LojaTests(unittest.TestCase):
     # definir os valores dos atributos para teste
     def setUp(self):
         self.loja = Loja(estoque = 10)
-#    
-#    def testeCadastrarCliente(self): #OK
-#        print("Testando o cadastro de cliente:\n")
-#        self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
-#        self.assertIsNotNone(self.loja.cadastroClientes) # verifica se a lista está vazia
-#
-#    def testeCadastrarClienteDuplicado(self): #OK
-#        print("Testando o cadastro de cliente em duplicata:\n")
-#        # adiciona o cliente pela primeira vez
-#        self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
-#        # passa no teste se acontecer o erro esperado dentro do método cadastraCliente()
-#        with self.assertRaises(ValueError):
-#            # tenta adicionar pela segunda vez
-#            self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
-#    
-#    def testeRecebePedido(self): #OK
-#        print("Testando receber o pedido:\n")
-#        # faz o pedido
-#        self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, modeloAluguel = 'hora')
-#        # verifica se o histórico de aluguel está vazio
-#        self.assertIsNotNone(self.loja.historicoAluguel)
-#
-#    def testeVerificarEstoqueDiminuiu(self): #OK
-#        print("Testando verificar se o estoque diminuiu após receber pedido:\n")
-#        # faz o pedido
-#        self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'hora')
-#        # verifica se o estoque foi atualizado
-#        self.assertEqual(self.loja.estoque, 5)
-#
-#    def testeVerificarEstoqueAumentou(self): #OK
-#        print("Testando verificar se o estoque aumentou após devolucao:\n")
-#        # adiciona o cliente
-#        self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
-#        # faz o pedido
-#        self.loja.receberPedido(cliente = self.loja.cadastroClientes[0], quantidade = 5, modeloAluguel = 'hora')
-#        # cliente devolve o pedido
-#        self.loja.devolverBicicletas(cliente = self.loja.cadastroClientes[0])
-#        # verifica se o estoque foi atualizado
-#        self.assertEqual(self.loja.estoque, 10)
-#
-#    def testeRecebePedidoSemEstoque(self): #OK
-#        print("Testando receber pedidos sem o estoque:\n")
-#        # faz o pedido sem o estoque necessario
-#        with self.assertRaises(ValueError):
-#            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 3650, modeloAluguel = 'hora')
-#
-#    def testeModeloAluguelInvalido(self): #OK
-#        print("Testando receber pedido com moelo de aluguel inválido:\n")
-#        # tenta usar a modalidade do aluguel em minutos
-#        with self.assertRaises(NameError):
-#            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'minutos')
-#
-#    def testeRecebePedidoPromocaoInvalida(self): #OK
-#        print("Testando receber pedido com promocao inválida:\n")
-#        # tenta dar o migué da promocao
-#        with self.assertRaises(TypeError):
-#            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, \
-#                modeloAluguel = 'hora', promocaoFamilia = True)
-#
-#    def testecalcularContaHora(self): # OK
-#        print("Testando calculo da conta na modalidade Hora:\n")
-#        dataAluguel = dt(2021,8,29, 12, 15, 0)      #12:15:00
-#        dataRetorno = dt(2021,8,29, 15, 15, 0)      #15:15:00
-#
-#        # já testa os dois casos, com ou sem promocao
-#        for index, promocao, nome in (0, False, 'adam'),(1,True, 'eve'):
-#            #faz o pedido
-#            self.loja.receberPedido(cliente = Cliente(nome = nome, cpf = '123'), quantidade = 3, \
-#                modeloAluguel = 'hora', promocaoFamilia = promocao, dataAluguel= dataAluguel)
-#            # chamada para calcular o valor testado
-#            valorTestado = self.loja.calcularConta(aluguel = self.loja.historicoAluguel[index], dataRetorno = dataRetorno)
-#
-#            # calculando o valor para comprar
-#            dataCalculada = formatarData(dataAluguel = dataAluguel, dataRetorno = dataRetorno)
-#            valorEsperado = dataCalculada['horas'] * self.loja.historicoAluguel[index]['quantidade'] * self.loja.tabelaPrecos['hora']
-#            # validação da promoção (desconto 30%)
-#            if self.loja.historicoAluguel[index]['promocaoFamilia']: valorEsperado *= 0.7
-#            # tratamento de tolerancia/multa, adiciona o valor de 1 hora, nao aplicando a promocao
-#            if dataCalculada['minutos'] > 15:
-#                valorEsperado += 5
-#            
-#            # verifica se o valor foi calculado corretamente
-#            self.assertEqual(valorTestado, valorEsperado)
-#
-#    def testecalcularContaDia(self): # OK
-#        print("Testando calculo da conta na modalidade Dia:\n")
-#
-#        dataAluguel = dt(2021,8,28, 15, 15, 0)      #28/08/2021
-#        dataRetorno = dt(2021,8,30, 12, 15, 0)      #30/08/2021
-#
-#        # já testa os dois casos, com ou sem promocao
-#        for index, promocao, nome in (0, False, 'adam'),(1,True, 'eve'):
-#            #faz o pedido
-#            self.loja.receberPedido(cliente = Cliente(nome = nome, cpf = '123'), quantidade = 3, \
-#                modeloAluguel = 'dia', promocaoFamilia = promocao, dataAluguel= dataAluguel)
-#            # chamada para calcular o valor testado
-#            valorTestado = self.loja.calcularConta(aluguel = self.loja.historicoAluguel[index], dataRetorno = dataRetorno)
-#            
-#            # calculando o valor para comprar
-#            dataCalculada = formatarData(dataAluguel = dataAluguel, dataRetorno = dataRetorno)
-#            valorEsperado = dataCalculada['dias'] * self.loja.historicoAluguel[index]['quantidade'] * self.loja.tabelaPrecos['dia']
-#            # validação da promoção (desconto 30%)
-#            if self.loja.historicoAluguel[index]['promocaoFamilia']: valorEsperado *= 0.7
-#            # tratamento de tolerancia/multa, adiciona o valor de 1 hora, nao aplicando a promocao
-#            if dataCalculada['horas'] > 6:
-#                valorEsperado += 25
-#            
-#            # verifica se o valor foi calculado corretamente
-#            self.assertEqual(valorTestado, valorEsperado) 
+    
+    def testeCadastrarCliente(self): #OK
+        print("Testando o cadastro de cliente:\n")
+        self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        self.assertIsNotNone(self.loja.cadastroClientes) # verifica se a lista está vazia
+
+    def testeCadastrarClienteDuplicado(self): #OK
+        print("Testando o cadastro de cliente em duplicata:\n")
+        # adiciona o cliente pela primeira vez
+        self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        # passa no teste se acontecer o erro esperado dentro do método cadastraCliente()
+        with self.assertRaises(ValueError):
+            # tenta adicionar pela segunda vez
+            self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+    
+    def testeRecebePedido(self): #OK
+        print("Testando receber o pedido:\n")
+        # faz o pedido
+        self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, modeloAluguel = 'hora')
+        # verifica se o histórico de aluguel está vazio
+        self.assertIsNotNone(self.loja.historicoAluguel)
+
+    def testeVerificarEstoqueDiminuiu(self): #OK
+        print("Testando verificar se o estoque diminuiu após receber pedido:\n")
+        # faz o pedido
+        self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'hora')
+        # verifica se o estoque foi atualizado
+        self.assertEqual(self.loja.estoque, 5)
+
+    def testeVerificarEstoqueAumentou(self): #OK
+        print("Testando verificar se o estoque aumentou após devolucao:\n")
+        # adiciona o cliente
+        self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
+        # faz o pedido
+        self.loja.receberPedido(cliente = self.loja.cadastroClientes[0], quantidade = 5, modeloAluguel = 'hora')
+        # cliente devolve o pedido
+        self.loja.devolverBicicletas(cliente = self.loja.cadastroClientes[0])
+        # verifica se o estoque foi atualizado
+        self.assertEqual(self.loja.estoque, 10)
+
+    def testeRecebePedidoSemEstoque(self): #OK
+        print("Testando receber pedidos sem o estoque:\n")
+        # faz o pedido sem o estoque necessario
+        with self.assertRaises(ValueError):
+            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 3650, modeloAluguel = 'hora')
+
+    def testeModeloAluguelInvalido(self): #OK
+        print("Testando receber pedido com moelo de aluguel inválido:\n")
+        # tenta usar a modalidade do aluguel em minutos
+        with self.assertRaises(NameError):
+            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'minutos')
+
+    def testeRecebePedidoPromocaoInvalida(self): #OK
+        print("Testando receber pedido com promocao inválida:\n")
+        # tenta dar o migué da promocao
+        with self.assertRaises(TypeError):
+            self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, \
+                modeloAluguel = 'hora', promocaoFamilia = True)
+
+    def testecalcularContaHora(self): # OK
+        print("Testando calculo da conta na modalidade Hora:\n")
+        dataAluguel = dt(2021,8,29, 12, 15, 0)      #12:15:00
+        dataRetorno = dt(2021,8,29, 15, 15, 0)      #15:15:00
+
+        # já testa os dois casos, com ou sem promocao
+        for index, promocao, nome in (0, False, 'adam'),(1,True, 'eve'):
+            #faz o pedido
+            self.loja.receberPedido(cliente = Cliente(nome = nome, cpf = '123'), quantidade = 3, \
+                modeloAluguel = 'hora', promocaoFamilia = promocao, dataAluguel= dataAluguel)
+            # chamada para calcular o valor testado
+            valorTestado = self.loja.calcularConta(aluguel = self.loja.historicoAluguel[index], dataRetorno = dataRetorno)
+
+            # calculando o valor para comprar
+            dataCalculada = formatarData(dataAluguel = dataAluguel, dataRetorno = dataRetorno)
+            valorEsperado = dataCalculada['horas'] * self.loja.historicoAluguel[index]['quantidade'] * self.loja.tabelaPrecos['hora']
+            # validação da promoção (desconto 30%)
+            if self.loja.historicoAluguel[index]['promocaoFamilia']: valorEsperado *= 0.7
+            # tratamento de tolerancia/multa, adiciona o valor de 1 hora, nao aplicando a promocao
+            if dataCalculada['minutos'] > 15:
+                valorEsperado += 5
+            
+            # verifica se o valor foi calculado corretamente
+            self.assertEqual(valorTestado, valorEsperado)
+
+    def testecalcularContaDia(self): # OK
+        print("Testando calculo da conta na modalidade Dia:\n")
+
+        dataAluguel = dt(2021,8,28, 15, 15, 0)      #28/08/2021
+        dataRetorno = dt(2021,8,30, 12, 15, 0)      #30/08/2021
+
+        # já testa os dois casos, com ou sem promocao
+        for index, promocao, nome in (0, False, 'adam'),(1,True, 'eve'):
+            #faz o pedido
+            self.loja.receberPedido(cliente = Cliente(nome = nome, cpf = '123'), quantidade = 3, \
+                modeloAluguel = 'dia', promocaoFamilia = promocao, dataAluguel= dataAluguel)
+            # chamada para calcular o valor testado
+            valorTestado = self.loja.calcularConta(aluguel = self.loja.historicoAluguel[index], dataRetorno = dataRetorno)
+            
+            # calculando o valor para comprar
+            dataCalculada = formatarData(dataAluguel = dataAluguel, dataRetorno = dataRetorno)
+            valorEsperado = dataCalculada['dias'] * self.loja.historicoAluguel[index]['quantidade'] * self.loja.tabelaPrecos['dia']
+            # validação da promoção (desconto 30%)
+            if self.loja.historicoAluguel[index]['promocaoFamilia']: valorEsperado *= 0.7
+            # tratamento de tolerancia/multa, adiciona o valor de 1 hora, nao aplicando a promocao
+            if dataCalculada['horas'] > 6:
+                valorEsperado += 25
+            
+            # verifica se o valor foi calculado corretamente
+            self.assertEqual(valorTestado, valorEsperado) 
 
     def testecalcularContaSemana(self): # OK
         print("Testando calculo da conta na modalidade Semana:\n")
