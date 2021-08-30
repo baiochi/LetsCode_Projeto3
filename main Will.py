@@ -24,7 +24,6 @@ class Loja (object):
 
     # Calcular a conta quando o cliente decidir devolver a bicicleta;
     def calcularConta (self, listaPedido):
-        self.listaPedido = listaPedido
         self.quantidadeLoc = listaPedido[0]
         self.desconto = listaPedido[6]
         self.quantidadeDev = listaPedido[7]
@@ -148,7 +147,7 @@ while entrada != 'END':
         # Confere se o cliente está no cadastro de locatários
         if nomeCliente in loja.locacoes.keys():
             print(f'Cliente Selecionado: {nomeCliente.capitalize()}: {loja.locacoes[nomeCliente]}.') 
-            quantDevolucao = int(input('Quantas bicicletas o cliente vai devolver? '))  # <= Try/Except digitar algo não int
+            quantDevolucao = int(input('Quantas bicicletas o cliente vai devolver? '))  # <= Try/Except digitar algo não int positivo
             
             # Assegura que o cliente não devolva mais ou menos bicicletas do que alugou.
             if quantDevolucao == loja.locacoes[nomeCliente]['quantidadeLoc']:
