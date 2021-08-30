@@ -1,6 +1,47 @@
 from datetime import datetime as dt
 from datetime import time
+import datetime
 import math
+
+
+# transforma objeto datetime.datime em timedelta e calcula os valores de semana, dia, hora, minutos, segundos
+# retorna em um diconario
+def formatarData(dataAluguel, dataRetorno):
+    dataDeltaAluguel = datetime.timedelta(
+        days=dataAluguel.day,
+        hours=dataAluguel.hour,
+        minutes=dataAluguel.minute,
+        seconds=dataAluguel.second
+    )
+
+    dataDeltaRetorno = datetime.timedelta(
+        days=dataRetorno.day,
+        hours=dataRetorno.hour,
+        minutes=dataRetorno.minute,
+        seconds=dataRetorno.second
+    )
+
+    tempoDelta = dataDeltaRetorno - dataDeltaAluguel
+
+    totalSeconds = tempoDelta.total_seconds()
+
+    segundos = totalSeconds % 60                     # verifica se sobrou segundos
+    resto = segundos                                 # armazena os segundos que sobraram
+    minutos = ((totalSeconds - resto) / 60) % 60     # remove os segundos, e calcula se sobrou minutos
+    resto += minutos*60                              # armazena os minutos que sobraram
+    horas = ((totalSeconds - resto) / 3600) % 24     # remove os minutos, e calcula se sobrou horas
+    resto += horas*3600                              # armazena as horas que sobraram
+    dias = ((totalSeconds - resto) / 86400) % 7     # remove as horas, e calcula se sobrou dias
+    resto += dias*86400                              # armazena os dias que sobraram
+    semanas = ((totalSeconds - resto) / 604800)
+
+    return {
+        'semanas' : semanas, 
+        'dias' : dias, 
+        'horas' : horas, 
+        'minutos' : minutos, 
+        'segundos' : segundos
+    }
 
 """
 Métodos do Cliente:
@@ -151,56 +192,56 @@ class Loja(object):
         return self.calcularConta(aluguel)
 
     # Faz o cálculo de acordo com a modalidade e tempo do aluguel
-    def calcularConta(self, aluguel, debug = False, dataAtual = dt.now()):
-        # extrai a data atual
-        if debug:
-            dataAtual = dataAtual
+    def calcularConta(self, aluguel, dataRetorno = dt.now()):
+
+        # retorna os dados com a data calculada
+        dataCalculada = formatarData(dataAluguel = aluguel['dataAluguel'] , dataRetorno = dataRetorno)
 
         # Calculo para a modalidade R$5/hora
         if aluguel['modeloAluguel'] == 'hora':
-            # calcula os minutos
-            minutos = dataAtual.minute - aluguel['dataAluguel'].minute
-            if minutos < 0: minutos += 60 # evita deixar os minutos em negativos
-            # calcula as horas
-            horas = dataAtual.hour - aluguel['dataAluguel'].hour
-            # soma final, computando os minutos excedentes
-            tempoAluguel = math.ceil(horas + (minutos/60))
+            
             # calcula o valor
-            valorAluguel = tempoAluguel * aluguel['quantidade'] * self.tabelaPrecos['hora'] # 5
+            valorAluguel = dataCalculada['horas'] * aluguel['quantidade'] * self.tabelaPrecos['hora'] # 5
             # validação da promoção (desconto 30%)
             if aluguel['promocaoFamilia']: valorAluguel *= 0.7
+            # tratamento de tolerancia/multa, adiciona o valor de 1 hora, nao aplicando a promocao
+            if dataCalculada['minutos'] > 15:
+                valorAluguel += 5
+
             # log
-            print(f'[log] Cliente: {aluguel["cliente"].getNome()}, Hora da devolucao: {dataAtual.strftime("%H:%M:%S")},',
+            print(
+                f'[log] Cliente: {aluguel["cliente"].getNome()}, Hora da devolucao: {dataRetorno.strftime("%H:%M:%S")},',
                 f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")}')
             return valorAluguel
 
         # Calculo para a modalidade R$25/dia
         elif aluguel['modeloAluguel'] == 'dia':
+
             # calculo do dia
-            tempoAluguel = dataAtual.day - aluguel['dataAluguel'].day
-            ### falta validar o resultado de dia negativo, e.g. 29/08 - 30/07
-            valorAluguel = tempoAluguel * aluguel['quantidade'] * self.tabelaPrecos['dia'] # 25
+            valorAluguel = dataCalculada['dias'] * aluguel['quantidade'] * self.tabelaPrecos['dia'] # 25
             # validação da promoção (desconto 30%)
             if aluguel['promocaoFamilia']: valorAluguel *= 0.7
+            # tratamento de tolerancia/multa, passada 6 horas, adiciona mais uma diaria, nao aplicando a promocao
+            if dataCalculada['horas'] > 6:
+                valorAluguel += 25
+
             # log
-            print(f'[log] Cliente: {aluguel["cliente"].getNome()}, Data da devolucao: {dataAtual.strftime("%d/%m/%y")},',
+            print(
+                f'[log] Cliente: {aluguel["cliente"].getNome()}, Data da devolucao: {dataRetorno.strftime("%d/%m/%y")},',
                 f' Data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
             return valorAluguel
 
         # Calculo para a modalidade R$100/hora
         elif aluguel['modeloAluguel'] == 'semana':
-            # calculo da semana com base em 7 dias corridos
-            tempoAluguel = (dataAtual.day - aluguel['dataAluguel'].day) / 7
-            # tratar dias negativos
-
-            # arredonda o número para cima
-            tempoAluguel = math.ceil(tempoAluguel) 
-            valorAluguel = tempoAluguel * aluguel['quantidade'] * self.tabelaPrecos['semana'] # 100
+            # calculo da semana
+            valorAluguel = dataCalculada['semanas'] * aluguel['quantidade'] * self.tabelaPrecos['semana'] # 100
             # validação da promoção (desconto 30%)
             if aluguel['promocaoFamilia']: valorAluguel *= 0.7
+            # aplica multa por dia excedente, sendo R$25/dia, nao se aplica na promocao
+            if dataCalculada['dias'] > 0:
+                valorAluguel += 25 * dataCalculada['dias']
             # log
-            print(f'[log] Cliente: {aluguel["cliente"].getNome()}, Data da devolucao: {dataAtual.strftime("%d/%m/%y")},',
+            print(
+                f'[log] Cliente: {aluguel["cliente"].getNome()}, Data da devolucao: {dataRetorno.strftime("%d/%m/%y")},',
                 f'Data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
             return valorAluguel
-
-
