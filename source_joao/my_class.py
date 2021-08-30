@@ -3,25 +3,38 @@ from datetime import time
 import datetime
 import math
 
+# cores para visualizar melhor os logs
+COLORS = {
+    "black":"\u001b[30;1m",
+    "red": "\u001b[31;1m",
+    "green":"\u001b[32m",
+    "yellow":"\u001b[33;1m",
+    "blue":"\u001b[34;1m",
+    "cyan": "\u001b[36m",
+    "white":"\u001b[37m",
+}
+def colorText(text):
+    for color in COLORS: text = text.replace("[[" + color + "]]", COLORS[color])
+    return text
 
 # transforma objeto datetime.datime em timedelta e calcula os valores de semana, dia, hora, minutos, segundos
 # retorna em um diconario
 def formatarData(dataAluguel, dataRetorno):
-    dataDeltaAluguel = datetime.timedelta(
+    dataAluguelDelta = datetime.timedelta(
         days=dataAluguel.day,
         hours=dataAluguel.hour,
         minutes=dataAluguel.minute,
         seconds=dataAluguel.second
     )
 
-    dataDeltaRetorno = datetime.timedelta(
+    dataRetornoDelta = datetime.timedelta(
         days=dataRetorno.day,
         hours=dataRetorno.hour,
         minutes=dataRetorno.minute,
         seconds=dataRetorno.second
     )
 
-    tempoDelta = dataDeltaRetorno - dataDeltaAluguel
+    tempoDelta = dataRetornoDelta - dataAluguelDelta
 
     totalSeconds = tempoDelta.total_seconds()
 
@@ -123,10 +136,13 @@ class Loja(object):
         #for item in self.cadastroClientes:
         #    if cliente.getCPF() == item.getCPF():
         #        print(item)
-        if [item for item in self.cadastroClientes if cliente.getCPF() == item.getCPF()]:
-            raise ValueError('Cliente já cadastrado.')
 
+        if [item for item in self.cadastroClientes if cliente.getCPF() == item.getCPF()]:
+            raise ValueError(f'Cliente {cliente.getNome()} já cadastrado.')
+        # registra o cliente na lista cadastroClientes
         self.cadastroClientes.append(cliente)
+        #log
+        print(colorText(f'[[yellow]][log cadastraCliente][[white]]\nCliente {cliente.getNome()} cadastrado com sucesso.'))
 
     # Mostrar o estoque de bicicletas;
     def mostrarEstoque(self):
@@ -162,9 +178,10 @@ class Loja(object):
         # amazena os dados do aluguel
         self.historicoAluguel.append(aluguel) 
         # log
-        print(f'[log] {quantidade} bicileta(s) alugada(s) por R${self.tabelaPrecos[modeloAluguel]}/{modeloAluguel}',
+        print(colorText(f'[[yellow]][log receberPedido][[white]]\n {quantidade} bicileta(s) alugada(s) por R${self.tabelaPrecos[modeloAluguel]}/{modeloAluguel}'),
                 f'as {aluguel["dataAluguel"].strftime("%H:%M:%S")}',
-                f'no dia {aluguel["dataAluguel"].strftime("%d/%m/%y")}')
+                f'no dia {aluguel["dataAluguel"].strftime("%d/%m/%y")}',
+                f'\nEstoque atual: {self.mostrarEstoque()}', sep='')
         
         """except NameError:
             print('Modelo de alguel inválido!\n')
@@ -176,18 +193,14 @@ class Loja(object):
     # Finaliza o aluguel, atualizando o estoque e retornando o valor da conta
     def devolverBicicletas(self, cliente):
         # extrair o dicionário referente ao aluguel do cliente:
-        # versao "normal":
         for dicionario in self.historicoAluguel:
             if dicionario['cliente'].getNome() == cliente.getNome():
                 aluguel = dicionario
-        #print(aluguel['client'].getNome())
-        
-        # versao list comprehension
-        #aluguel = [aluguel for aluguel in self.historicoAluguel if aluguel['client'].getNome() == cliente.getNome()]
-        #print(aluguel[0]['client'].getNome())
 
         # atualiza o estoque
         self.estoque += aluguel['quantidade']
+        print(colorText(f'[[yellow]][log devolverBicicletas][[white]]\nQuantidade de bicicletas retornadas ao estoque:{aluguel["quantidade"]}'),
+              f'\nEstoque atual: {self.mostrarEstoque()}', sep='')
         # faz a chama do método e retorna o valor do aluguel
         return self.calcularConta(aluguel)
 
@@ -208,13 +221,6 @@ class Loja(object):
             if dataCalculada['minutos'] > 15:
                 valorAluguel += 5
 
-            # log
-            print(
-                f'[log] Cliente: {aluguel["cliente"].getNome()};\n Hora da devolucao: {dataRetorno.strftime("%H:%M:%S")};\n',
-                f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")};\n',
-                f'Valor do aluguel: {valorAluguel}')
-            return valorAluguel
-
         # Calculo para a modalidade R$25/dia
         elif aluguel['modeloAluguel'] == 'dia':
 
@@ -222,16 +228,9 @@ class Loja(object):
             valorAluguel = dataCalculada['dias'] * aluguel['quantidade'] * self.tabelaPrecos['dia'] # 25
             # validação da promoção (desconto 30%)
             if aluguel['promocaoFamilia']: valorAluguel *= 0.7
-            # tratamento de tolerancia/multa, passada 6 horas, adiciona mais uma diaria, nao aplicando a promocao
-            if dataCalculada['horas'] > 6:
-                valorAluguel += 25
-
-            # log
-            print(
-                f'[log] Cliente: {aluguel["cliente"].getNome()};\n Hora da devolucao: {dataRetorno.strftime("%H:%M:%S")};\n',
-                f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")};\n',
-                f'Valor do aluguel: {valorAluguel}')
-            return valorAluguel
+            # tratamento de tolerancia/multa, passada 3 horas, adiciona multa a cada hora, nao aplicando a promocao
+            if dataCalculada['horas'] > 3:
+                valorAluguel += dataCalculada['horas'] * self.tabelaPrecos['hora']
 
         # Calculo para a modalidade R$100/hora
         elif aluguel['modeloAluguel'] == 'semana':
@@ -241,10 +240,20 @@ class Loja(object):
             if aluguel['promocaoFamilia']: valorAluguel *= 0.7
             # aplica multa por dia excedente, sendo R$25/dia, nao se aplica na promocao
             if dataCalculada['dias'] > 0:
-                valorAluguel += 25 * dataCalculada['dias']
-            # log
-            print(
-                f'[log] Cliente: {aluguel["cliente"].getNome()};\n Hora da devolucao: {dataRetorno.strftime("%H:%M:%S")};\n',
-                f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")};\n',
-                f'Valor do aluguel: {valorAluguel}')
-            return valorAluguel
+                valorAluguel += dataCalculada['dias'] * self.tabelaPrecos['dia']
+        
+        # log
+        print(
+        colorText(f'[[yellow]][log calcularConta][[white]]\nCliente: {aluguel["cliente"].getNome()};\nHora da devolucao: {dataRetorno.strftime("%H:%M:%S")};\n'),
+        f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")};\n',
+        f'Valor do aluguel: R$ {valorAluguel}', sep='')
+        return valorAluguel
+
+
+
+
+#print(aluguel['client'].getNome())
+
+#conferir cliente: versao list comprehension 
+#aluguel = [aluguel for aluguel in self.historicoAluguel if aluguel['client'].getNome() == cliente.getNome()]
+#print(aluguel[0]['client'].getNome())

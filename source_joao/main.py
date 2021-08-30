@@ -39,6 +39,7 @@ classe Loja:
     - calcularConta(aluguel): recebe um dicionário contendo as informacoes referentes ao aluguel e retorna o valor total
 
 """
+
 '''
 Função para validar a entrada de dados do input do operador da loja:
 Argumentos: entrada
