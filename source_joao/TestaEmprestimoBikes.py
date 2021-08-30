@@ -72,14 +72,14 @@ class LojaTests(unittest.TestCase):
             self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
     
     def testeRecebePedido(self): #OK
-        print("Testando :\n")
+        print("Testando receber o pedido:\n")
         # faz o pedido
         self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, modeloAluguel = 'hora')
         # verifica se o histórico de aluguel está vazio
         self.assertIsNotNone(self.loja.historicoAluguel)
 
     def testeVerificarEstoqueDiminuiu(self): #OK
-        print("Testando :\n")
+        print("Testando verificar se o estoque diminuiu após receber pedido:\n")
         # faz o pedido
         self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'hora')
         # verifica se o estoque foi atualizado
