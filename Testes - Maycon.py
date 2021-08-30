@@ -5,3 +5,5 @@ from PJ3.Maycon.py import Cliente, Loja
 joze = Cliente()
 joao = Cliente()
 matriz = Loja()
+#Teste de aluguel de bikes
+joze.alugar()
