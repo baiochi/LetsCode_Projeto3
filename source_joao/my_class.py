@@ -210,8 +210,9 @@ class Loja(object):
 
             # log
             print(
-                f'[log] Cliente: {aluguel["cliente"].getNome()}, Hora da devolucao: {dataRetorno.strftime("%H:%M:%S")},',
-                f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")}')
+                f'[log] Cliente: {aluguel["cliente"].getNome()};\n Hora da devolucao: {dataRetorno.strftime("%H:%M:%S")};\n',
+                f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")};\n',
+                f'Valor do aluguel: {valorAluguel}')
             return valorAluguel
 
         # Calculo para a modalidade R$25/dia
@@ -227,8 +228,9 @@ class Loja(object):
 
             # log
             print(
-                f'[log] Cliente: {aluguel["cliente"].getNome()}, Data da devolucao: {dataRetorno.strftime("%d/%m/%y")},',
-                f' Data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
+                f'[log] Cliente: {aluguel["cliente"].getNome()};\n Hora da devolucao: {dataRetorno.strftime("%H:%M:%S")};\n',
+                f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")};\n',
+                f'Valor do aluguel: {valorAluguel}')
             return valorAluguel
 
         # Calculo para a modalidade R$100/hora
@@ -242,6 +244,7 @@ class Loja(object):
                 valorAluguel += 25 * dataCalculada['dias']
             # log
             print(
-                f'[log] Cliente: {aluguel["cliente"].getNome()}, Data da devolucao: {dataRetorno.strftime("%d/%m/%y")},',
-                f'Data do aluguel: {aluguel["dataAluguel"].strftime("%d/%m/%y")}') #log
+                f'[log] Cliente: {aluguel["cliente"].getNome()};\n Hora da devolucao: {dataRetorno.strftime("%H:%M:%S")};\n',
+                f'Hora do aluguel: {aluguel["dataAluguel"].strftime("%H:%M:%S")};\n',
+                f'Valor do aluguel: {valorAluguel}')
             return valorAluguel

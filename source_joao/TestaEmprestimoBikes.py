@@ -63,7 +63,7 @@ class LojaTests(unittest.TestCase):
         self.assertIsNotNone(self.loja.cadastroClientes) # verifica se a lista está vazia
 
     def testeCadastrarClienteDuplicado(self): #OK
-        print("Testando o cadastro de cliente em duplicata:\n")
+        print("\nTestando o cadastro de cliente em duplicata:\n")
         # adiciona o cliente pela primeira vez
         self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
         # passa no teste se acontecer o erro esperado dentro do método cadastraCliente()
@@ -72,21 +72,21 @@ class LojaTests(unittest.TestCase):
             self.loja.cadastraCliente(Cliente(nome = 'joao', cpf = '123.456.789-00'))
     
     def testeRecebePedido(self): #OK
-        print("Testando receber o pedido:\n")
+        print("\nTestando receber o pedido:\n")
         # faz o pedido
         self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, modeloAluguel = 'hora')
         # verifica se o histórico de aluguel está vazio
         self.assertIsNotNone(self.loja.historicoAluguel)
 
     def testeVerificarEstoqueDiminuiu(self): #OK
-        print("Testando verificar se o estoque diminuiu após receber pedido:\n")
+        print("\nTestando verificar se o estoque diminuiu após receber pedido:\n")
         # faz o pedido
         self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'hora')
         # verifica se o estoque foi atualizado
         self.assertEqual(self.loja.estoque, 5)
 
     def testeVerificarEstoqueAumentou(self): #OK
-        print("Testando verificar se o estoque aumentou após devolucao:\n")
+        print("\nTestando verificar se o estoque aumentou após devolucao:\n")
         # adiciona o cliente
         self.loja.cadastroClientes.append(Cliente(nome = 'joao', cpf = '123.456.789-00'))
         # faz o pedido
@@ -97,31 +97,31 @@ class LojaTests(unittest.TestCase):
         self.assertEqual(self.loja.estoque, 10)
 
     def testeRecebePedidoSemEstoque(self): #OK
-        print("Testando receber pedidos sem o estoque:\n")
+        print("\nTestando receber pedidos sem o estoque:\n")
         # faz o pedido sem o estoque necessario
         with self.assertRaises(ValueError):
             self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 3650, modeloAluguel = 'hora')
 
     def testeModeloAluguelInvalido(self): #OK
-        print("Testando receber pedido com moelo de aluguel inválido:\n")
+        print("\nTestando receber pedido com moelo de aluguel inválido:\n")
         # tenta usar a modalidade do aluguel em minutos
         with self.assertRaises(NameError):
             self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 5, modeloAluguel = 'minutos')
 
     def testeRecebePedidoPromocaoInvalida(self): #OK
-        print("Testando receber pedido com promocao inválida:\n")
+        print("\nTestando receber pedido com promocao inválida:\n")
         # tenta dar o migué da promocao
         with self.assertRaises(TypeError):
             self.loja.receberPedido(cliente = Cliente(nome = 'joao', cpf = '123.456.789-00'), quantidade = 1, \
                 modeloAluguel = 'hora', promocaoFamilia = True)
 
     def testecalcularContaHora(self): # OK
-        print("Testando calculo da conta na modalidade Hora:\n")
+        print("\nTestando calculo da conta na modalidade Hora:\n")
         dataAluguel = dt(2021,8,29, 12, 15, 0)      #12:15:00
         dataRetorno = dt(2021,8,29, 15, 15, 0)      #15:15:00
 
         # já testa os dois casos, com ou sem promocao
-        for index, promocao, nome in (0, False, 'adam'),(1,True, 'eve'):
+        for index, promocao, nome in (0, False, 'Maria'),(1,True, 'José'):
             #faz o pedido
             self.loja.receberPedido(cliente = Cliente(nome = nome, cpf = '123'), quantidade = 3, \
                 modeloAluguel = 'hora', promocaoFamilia = promocao, dataAluguel= dataAluguel)
@@ -141,13 +141,13 @@ class LojaTests(unittest.TestCase):
             self.assertEqual(valorTestado, valorEsperado)
 
     def testecalcularContaDia(self): # OK
-        print("Testando calculo da conta na modalidade Dia:\n")
+        print("\nTestando calculo da conta na modalidade Dia:\n")
 
         dataAluguel = dt(2021,8,28, 15, 15, 0)      #28/08/2021
         dataRetorno = dt(2021,8,30, 12, 15, 0)      #30/08/2021
 
         # já testa os dois casos, com ou sem promocao
-        for index, promocao, nome in (0, False, 'adam'),(1,True, 'eve'):
+        for index, promocao, nome in (0, False, 'Maria'),(1,True, 'José'):
             #faz o pedido
             self.loja.receberPedido(cliente = Cliente(nome = nome, cpf = '123'), quantidade = 3, \
                 modeloAluguel = 'dia', promocaoFamilia = promocao, dataAluguel= dataAluguel)
@@ -167,13 +167,13 @@ class LojaTests(unittest.TestCase):
             self.assertEqual(valorTestado, valorEsperado) 
 
     def testecalcularContaSemana(self): # OK
-        print("Testando calculo da conta na modalidade Semana:\n")
+        print("\nTestando calculo da conta na modalidade Semana:\n")
         
         dataAluguel = dt(2021,9,11, 15, 15, 0)      #11/09/2021
         dataRetorno = dt(2021,8,29, 12, 15, 0)      #29/08/2021
 
         # já testa os dois casos, com ou sem promocao
-        for index, promocao, nome in (0, False, 'adam'),(1,True, 'eve'):
+        for index, promocao, nome in (0, False, 'Maria'),(1,True, 'José'):
             #faz o pedido
             self.loja.receberPedido(cliente = Cliente(nome = nome, cpf = '123'), quantidade = 3, \
                 modeloAluguel = 'semana', promocaoFamilia = promocao, dataAluguel= dataAluguel)
