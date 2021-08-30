@@ -24,7 +24,7 @@ class Loja (object):
 
     # Calcular a conta quando o cliente decidir devolver a bicicleta;
     def calcularConta (self, listaPedido):
-        self.listaPedido = listaPedido
+
         self.quantidadeLoc = listaPedido[0]
         self.desconto = listaPedido[6]
         self.quantidadeDev = listaPedido[7]
