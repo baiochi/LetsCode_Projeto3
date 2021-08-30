@@ -1,175 +1,202 @@
+from datetime import datetime as dt
+
 class Loja (object):
     
     def __init__ (self, estoque, caixa):
         self.estoque = estoque
         self.caixa = caixa
+        self.locacoes = {}
     
     # Mostrar o estoque de bicicletas para o Cliente;
     def mostrarEstoque (self):
         return self.estoque
 
     # Alterar a quantidade do estoque.
-    def alterarEstoque (self, baixa):
-        self.estoque -= baixa
+    def alterarEstoque (self, quantidade):
+        self.estoque -= quantidade
 
     # Receber pedidos de aluguéis por hora, diários ou semanais validando a disponibilidade do estoque.
-    def receberPedido (self, periodo, quantidade, plano, desconto):
-        self.periodo = int(periodo)
-        self.quantidade = int(quantidade)
-        self.plano = plano
-        self.desconto = desconto
+    def receberPedido (self, quantidade):
+        if self.estoque >= quantidade:
+            return True
+        else:
+            return False
 
     # Calcular a conta quando o cliente decidir devolver a bicicleta;
-    def calcularConta (self):
-        if self.plano == '1':
-            if self.desconto:
-                total = (self.periodo * self.quantidade * 5) * 0,7
-            else:
-                total = self.periodo * self.quantidade * 5
-        elif self.plano == "2":
-            if self.desconto:
-                total = (self.periodo * self.quantidade * 25) * 0,7
-            else:
-                total = self.periodo * self.quantidade * 25
+    def calcularConta (self, listaPedido):
+        self.listaPedido = listaPedido
+        self.quantidadeLoc = listaPedido[0]
+        self.desconto = listaPedido[6]
+        self.quantidadeDev = listaPedido[7]
+
+        # Recebe a lista "listaDev" e monta as datas no formato datetime conforme os índices
+        self.dataLoc = dt(listaPedido[3], listaPedido[2], listaPedido[1], listaPedido[4], listaPedido[5])
+        self.dataDev = dt(int(listaPedido[10]), int(listaPedido[9]), int(listaPedido[8]), int(listaPedido[11]), int(listaPedido[12]))
+        self.dataDif = self.dataDev - self.dataLoc
+
+        # Faz o cálculo do total a pagar com base em transformar o total do timedelta "self.datadif" em segundos 
+        self.totalSemanas = self.dataDif.total_seconds() // 604800  # 604800 segundos em uma semana
+        self.sobra = self.dataDif.total_seconds() - self.totalSemanas * 604800
+        self.totalDias =  self.sobra // 86400  # 86400 segundos em um dia
+        self.sobra = self.sobra - self.totalDias * 86400
+        self.totalHoras = self.sobra // 3600  # 3600 segundos em uma hora
+        self.sobra = self.sobra - self.totalHoras * 3600
+        self.totalMinutos = self.sobra // 60  # 60 segundos em um minuto
+
+        if self.totalMinutos > 15: # 15min de tolerância, senão conta uma hora a mais.
+            self.totalHoras += 1
+            valorTotal = (self.totalSemanas * 100 + self.totalDias * 25 + self.totalHoras * 5) * self.quantidadeLoc
         else:
-            if self.desconto:
-                total = (self.periodo * self.quantidade * 100) * 0,7
-            else:
-                total = self.periodo * self.quantidade * 100
+            valorTotal = (self.totalSemanas * 100 + self.totalDias * 25 + self.totalHoras * 5) * self.quantidadeLoc
+
+        if self.desconto:
+            valorTotal = valorTotal * 0.7
+        else:
+            valorTotal
+        
+        return valorTotal
 
 class Cliente (object):
-    
     def __init__ (self, carteira):
         self.carteira = carteira
 
-    # Alugar bicicletas por hora (R$5/hora);
-    def alugarHora (self, periodo):
-        self.periodo = periodo
-        self.quantidade = 1
-        self.plano = 1
-        self.desconto = False
-    
-    # Alugar bicicletas por dia (R$25/dia);
-    def alugarDia (self, periodo):
-        self.periodo = periodo
-        self.quantidade = 1
-        self.plano = 2
-        self.desconto = False
-
-    # Alugar bicicletas por semana (R$100/semana)
-    def alugarSemana (self, periodo):
-        self.periodo = periodo
-        self.quantidade = 1
-        self.plano = 3
-        self.desconto = False
-    
-    # Aluguel para família, uma promoção que pode incluir de 3 a 5 empréstimos
-    # (de qualquer tipo) com 30% de desconto no valor total.
-    def alugarFamilia (self, periodo, quantidade, plano):
-        self.periodo = periodo
-        self.quantidade = quantidade
-        self.plano = plano
-        self.desconto = True
-
 '''
-Função para validar a entrada de dados do input do cliente:
+Função para validar a entrada de dados do input do operador da loja:
 Argumentos: entrada
 Retorna: entrada
 '''
 def validaEntrada(entrada):
-    _opcoes = ('0', '1', '2', '3', '4', 'E')
+    _opcoes = ('T', 'E', 'CX', 'C','L', 'D', 'END')
     while entrada not in _opcoes:
-        entrada = input('\nOpção inválida! Qual o plano que você deseja contratar? ').upper()
+        entrada = input('\nOpção inválida! Digite a opção desejada: ').upper()
     return entrada
-
 '''
-Função do menu: chama os devidos métodos de cada Classe de acordo com as escolhas do cliente.
+Função para limitar a a entrada de dados do input do operador da loja:
 Argumentos: entrada
-Retorna: None.
+Retorna: entrada
 '''
-def menuEntradas(entrada):
-    if entrada == 'E':
-        print('\nConferir o estoque disponível foi selecionado!')
-        print(f'O estoque atual é de {loja.mostrarEstoque()} biciletas disponíveis.')
-        entrada = validaEntrada(input('\nQual o plano que você deseja contratar? ').upper())
-        menuEntradas(entrada)
-
-    elif entrada == '0':
-        print('\nÉ uma pena... Mas aguardamos você numa próxima!')
-        
-    # Plano Hora
-    elif entrada == '1':
-        print('\nO plano Passeio foi selecionado!')
-        qtdHoras = input('Por quantas horas você deseja alugar? ')
-        print(f'Selecionado {qtdHoras} hora(s)!')
-        cliente.alugarHora(qtdHoras)
-
-    # Plano Dia
-    elif entrada == '2':
-        print('\nO plano Diário foi selecionado!')
-        qtdDias = input('Por quantos dias você deseja alugar? ')
-        print(f'Selecionado {qtdDias} dia(s)!')
-        cliente.alugarDia(qtdDias)
-        
-    # Plano Semana
-    elif entrada == '3':
-        print('\nO plano Semanal foi selecionado!')
-        qtdSemanas = input('Por quantas semanas você deseja alugar? ')
-        print(f'Selecionado {qtdSemanas} semana(s)!')
-        cliente.alugarSemana(qtdSemanas)
-        
-    # Plano Família
-    else: # opcao == '4'
-        print('\nO plano Família foi selecionado!')
-        qtdBicicletas = input('Quantas bicicletas você deseja alugar? ')
-        while qtdBicicletas not in ('3','4','5'):
-            qtdBicicletas = input('Digite um valor entre 3 e 5! Quantas bicicletas você deseja alugar? ')
-        
-        plano = input(f'Em qual dos planos você deseja alugar {qtdBicicletas} bicicletas? ')
-        while plano not in ('1','2','3'):
-            print('Valor Inválido! Digite 1, 2 ou 3 correspondente ao plano desejado.')
-            plano = input(f'Em qual dos planos você deseja alugar {qtdBicicletas} bicicletas? ')
-        
-        preenche = ""
-        if plano == '1':
-            preenche = 'quantas horas'
-        elif plano == '2':
-            preenche = 'quantos dias'
-        else:
-            preenche = 'quantas semanas'
-        periodo = input(f'Por {preenche} você deseja alugar {qtdBicicletas} bicicletas? ')
-        
-        preenche2 = ""
-        if plano == '1':
-            preenche2 = 'hora(s)'
-        elif plano == '2':
-            preenche2 = 'dia(s)'
-        else:
-            preenche2 = 'semana(s)'
-        print(f'Selecionado alugar {qtdBicicletas} bicicletas no Plano {plano} por {periodo} {preenche2}!')
-        cliente.alugarFamilia(periodo, qtdBicicletas, plano)
+def opcoesSistema():
+    print('Digite \"T\" para visualizar a tabela de preços;')
+    print('Digite \"E\" para visualizar o estoque disponível;')
+    print('Digite \"CX\" para visualizar o valor em caixa;')
+    print('Digite \"C\" para visualizar os clientes com locações ativas;')
+    print('Digite \"L\" para fazer uma nova locação;')
+    print('Digite \"D\" para registrar uma devolução;')
+    print('Digite \"end\" para encerrar o sistema.')
+    opcao = input('Digite a opção desejada: ').upper()
+    return opcao
 
 # Init classes
-cliente = Cliente(200)
-loja = Loja(100, 500)
+loja = Loja (100, 500)
+cliente = Cliente (200)
+print('###### Sistema da Locadora de Bicicletas LTDA #####\n')
+entrada = validaEntrada(opcoesSistema())
 
-print('Bem vindo à Locadora de Bicicletas LTDA!')
-print('Aqui temos uma variedade de planos para o aluguel de bicicletas, que são:\n')
+while entrada != 'END':
+    if entrada == 'T':
+        print('\nConferir a tabela de preços foi selecionado!')
+        print('Preço locação por hora: R$ 5,00')
+        print('Preço locação por dia: R$ 25,00')
+        print('Preço locação por semana: R$ 100,00')
+        print('Preço locação família: locar de 3 a 5 bicicletas com desconto de 30%')
+        print('em qualquer uma das modalidades de locação anteriores.\n')
+        entrada = validaEntrada(opcoesSistema())
 
-print('1 - Plano Passeio - R$ 5,00 por hora;')
-print('2 - Plano Diário - R$ 25,00 por dia;')
-print('3 - Plano Semanal - R$ 100,00 por semana e;')
-print('4 - Plano Família, que consiste em alugar de 3 a 5 bicicletas nos planos')
-print('    anteriores e que dá 30% de desconto no valor total do pedido!\n')
+    elif entrada == 'E':
+        print('\nConferir o estoque disponível foi selecionado!')
+        print(f'O estoque atual é de {loja.mostrarEstoque()} biciletas disponíveis.\n')
+        entrada = validaEntrada(opcoesSistema())
 
-print('Digite o valor de 1 a 4 conforme o plano desejado,')
-print('digite \"E\" para visualizar a quantidade de biciletas em estoque')
-print('ou digite 0 para cancelar.')
+    elif entrada == 'CX':
+        print('\nConferir o valor em caixa foi selecionado!')
+        print( f'O valor atual do caixa é de R$ {loja.caixa}\n')
+        entrada = validaEntrada(opcoesSistema())
 
-opcao = validaEntrada(input('\nQual o plano que você deseja contratar? ').upper())
-menuEntradas(opcao)
+    elif entrada == 'C':
+        print('\nConferir o clientes com locações ativas foi selecionado!')
+        print(f'{loja.locacoes.items()}\n')
+        entrada = validaEntrada(opcoesSistema())
 
-print('\n##### LOG #####:')
-print(f'Cliente - está retornando: Quant. Bicicletas - {cliente.quantidade}, Plano - {cliente.plano} e Período - {cliente.periodo}.')
+    elif entrada == "L":
+        nomeCliente = input('\nDigite o nome do cliente: ').upper()
+        quantLocacao = int(input('Quantas bicicletas o cliente vai alugar? ')) # <= Try / Except: qualquer coisa que não seja int.
+        loja.receberPedido(quantLocacao)
+        if loja.receberPedido(quantLocacao):
+            dataLocacao = dt.today()
+            loja.locacoes[nomeCliente] = {
+            'quantidadeLoc': quantLocacao,
+            'diaLoc': dataLocacao.day,
+            'mesLoc': dataLocacao.month,
+            'anoLoc': dataLocacao.year,
+            'horaLoc': dataLocacao.hour,
+            'minutosLoc': dataLocacao.minute
+            }
+            loja.alterarEstoque(quantLocacao)
+            if quantLocacao in (3, 4, 5):
+                loja.locacoes[nomeCliente]['desconto'] = True
+            else:
+                loja.locacoes[nomeCliente]['desconto'] = False
+            print(f'Locação registrada para o cliente {nomeCliente.capitalize()} de {quantLocacao} bicicletas na data de {dataLocacao.day}/{dataLocacao.month}/{dataLocacao.year} às {dataLocacao.hour} hora(s) e {dataLocacao.minute} minuto(s).\n')
+        else:
+             print(f'Estoque insuficiente! Estoque atual: {loja.mostrarEstoque()}')
+
+        entrada = validaEntrada(opcoesSistema())
+    
+    else: # Devolução
+        nomeCliente = input('\nDigite o nome do cliente: ').upper()
+       
+        # Confere se o cliente está no cadastro de locatários
+        if nomeCliente in loja.locacoes.keys():
+            print(f'Cliente Selecionado: {nomeCliente.capitalize()}: {loja.locacoes[nomeCliente]}.') 
+            quantDevolucao = int(input('Quantas bicicletas o cliente vai devolver? '))  # <= Try/Except digitar algo não int
+            
+            # Assegura que o cliente não devolva mais ou menos bicicletas do que alugou.
+            if quantDevolucao == loja.locacoes[nomeCliente]['quantidadeLoc']:
+                dataDevolucao = input('Qual a data da devolução (Digitar em DD/MM/AAAA)? ').split('/')  # <= Try/Except digitar algo errado
+                horarioDevolucao = input('Qual o horário da devolução (Digitar em HH:MM)? ').split(':')  # <= Try/Except digitar algo errado
+                diaDevolucao = dataDevolucao[0]
+                mesDevolucao = dataDevolucao[1]
+                anoDevolucao = dataDevolucao[2]
+                horaDevolucao = horarioDevolucao[0]
+                minutoDevolucao = horarioDevolucao[1]
+
+                # Atribuição de todos os valores necessários para o cálculo do datetime
+                loja.locacoes[nomeCliente]['quantidadeDev'] = quantDevolucao
+                loja.locacoes[nomeCliente]['diaDev'] = diaDevolucao
+                loja.locacoes[nomeCliente]['mesDev'] = mesDevolucao
+                loja.locacoes[nomeCliente]['anoDev'] = anoDevolucao
+                loja.locacoes[nomeCliente]['horaDev'] = horaDevolucao
+                loja.locacoes[nomeCliente]['minutosDev'] = minutoDevolucao
+                
+                # Lista para formação dos datetimes:
+                listaDev = []
+                for i in loja.locacoes[nomeCliente].values():
+                    listaDev.append(i)
+
+                # Retorno do valor a pagar e confirmação de pagamento 
+                print(f'\nValor a receber: R$ {loja.calcularConta(listaDev)}\n')
+                recebido = input('O cliente pagou a conta? (Digite S/N) \n').upper()
+                while recebido not in ('S','N'):
+                    recebido = input('Entrada inválida! O cliente pagou a conta? (Digite S/N) \n').upper()
+                    while recebido != 'S':
+                        recebido = input('Cobre o cliente! O cliente pagou a conta? (Digite S/N) \n').upper()
+                
+                # Update do caixa / carteira cliente
+                loja.caixa += loja.calcularConta(listaDev)
+                cliente.carteira -= loja.calcularConta(listaDev)
+
+                # Devolução ao estoque e delete do cliente nas locações ativas
+                loja.alterarEstoque(quantDevolucao*-1)
+                loja.locacoes[nomeCliente].clear()
+                
+                entrada = validaEntrada(opcoesSistema())
+            
+            else:
+                print(f'A quantidade devolvida está incorreta, repita a operação. Quantidade locada: {loja.locacoes[nomeCliente]["quantidadeLoc"]} | Quantidade devolvida: {quantDevolucao}\n')    
+                entrada = validaEntrada(opcoesSistema())
+
+        else:
+            print('O Cliente selecionado não consta na base de dados.\n')
+            entrada = validaEntrada(opcoesSistema())
 
 print('\nFim do programa.')
