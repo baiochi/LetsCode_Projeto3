@@ -219,7 +219,7 @@ class Loja(object):
             if aluguel['promocaoFamilia']: valorAluguel *= 0.7
             # tratamento de tolerancia/multa, adiciona o valor de 1 hora, nao aplicando a promocao
             if dataCalculada['minutos'] > 15:
-                valorAluguel += 5
+                valorAluguel += self.tabelaPrecos['hora']
 
         # Calculo para a modalidade R$25/dia
         elif aluguel['modeloAluguel'] == 'dia':
